@@ -1,0 +1,125 @@
+const express = require('express');
+const router = express.Router();
+const UserCardController = require('../controllers/userCardController.js');
+
+/**
+ * @swagger
+ * tags:
+ *   name: UserCards
+ *   description: API for managing user cards.
+ */
+
+/**
+ * @swagger
+ * /api/user-cards:
+ *   get:
+ *     summary: Get a list of all user cards.
+ *     tags: [UserCards]
+ *     responses:
+ *       200:
+ *         description: A list of user card objects.
+ *       500:
+ *         description: Internal server error.
+ */
+router.get('/api/user-cards', UserCardController.getAllUserCards);
+
+/**
+ * @swagger
+ * /api/user-cards/{userCardId}:
+ *   get:
+ *     summary: Get a user card by ID.
+ *     tags: [UserCards]
+ *     parameters:
+ *       - in: path
+ *         name: userCardId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID of the user card to retrieve.
+ *     responses:
+ *       200:
+ *         description: The user card object.
+ *       404:
+ *         description: User card not found.
+ *       500:
+ *         description: Internal server error.
+ */
+router.get('/api/user-cards/:userCardId', UserCardController.getUserCardById);
+
+/**
+ * @swagger
+ * /api/user-cards:
+ *   post:
+ *     summary: Create a new user card.
+ *     tags: [UserCards]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/UserCard'
+ *     responses:
+ *       201:
+ *         description: The created user card.
+ *       400:
+ *         description: Invalid request data.
+ *       500:
+ *         description: Internal server error.
+ */
+router.post('/api/user-cards', UserCardController.createUserCard);
+
+/**
+ * @swagger
+ * /api/user-cards/{userCardId}:
+ *   put:
+ *     summary: Update a user card by ID.
+ *     tags: [UserCards]
+ *     parameters:
+ *       - in: path
+ *         name: userCardId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID of the user card to update.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/UserCard'
+ *     responses:
+ *       200:
+ *         description: The updated user card.
+ *       404:
+ *         description: User card not found.
+ *       400:
+ *         description: Invalid request data.
+ *       500:
+ *         description: Internal server error.
+ */
+router.put('/api/user-cards/:userCardId', UserCardController.updateUserCard);
+
+/**
+ * @swagger
+ * /api/user-cards/{userCardId}:
+ *   delete:
+ *     summary: Delete a user card by ID.
+ *     tags: [UserCards]
+ *     parameters:
+ *       - in: path
+ *         name: userCardId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID of the user card to delete.
+ *     responses:
+ *       204:
+ *         description: User card deleted successfully.
+ *       404:
+ *         description: User card not found.
+ *       500:
+ *         description: Internal server error.
+ */
+router.delete('/api/user-cards/:userCardId', UserCardController.deleteUserCard);
+
+module.exports = router;
