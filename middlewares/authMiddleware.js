@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
-const { JWT_SECRET } = require('../config'); // Adjust the path and configuration as needed
+require('dotenv').config();
+const JWT_SECRET  = process.env.JWT_SECRET;
 
 /**
  * Middleware to check if a user is authenticated with a valid JWT token.

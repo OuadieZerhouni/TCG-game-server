@@ -35,7 +35,22 @@ class UserService {
     }
   }
 
-  // Add methods for updating, querying, and deleting users here.
+  /**
+   * Get a list of all users.
+   *
+   * @returns {Promise<User[]>} - A list of all users.
+   */
+  static async getAllUsers() {
+    try {
+      const users = await User.find().exec();
+      return users;
+    } catch (error) {
+      throw new Error('Unable to get all users');
+    }
+
+  }
+
+
 }
 
 module.exports = UserService;

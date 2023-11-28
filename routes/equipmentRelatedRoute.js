@@ -26,12 +26,11 @@ const EquipmentRelatedController = require('../controllers/equipmentRelatedContr
  *       200:
  *         description: A list of user cards equipped with the equipment.
  *       404:
- *         description: Equipment not found.
+ *         desc     ription: Equipment not found.
  *       500:
  *         description: Internal server error.
  */
 router.get('/api/equipments/:equipmentId/user-cards', EquipmentRelatedController.getEquippedUserCards);
 
-// Add more related operations for the Equipment model here
 
 module.exports = router;
