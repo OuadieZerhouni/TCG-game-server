@@ -17,8 +17,6 @@ const userCardRoute = require('./routes/userCardRoute');
 const equipmentRoute = require('./routes/equipmentRoute');
 const deckRoute = require('./routes/deckRoute');
 
-
-
 // Register the routes.
 app.use('/', userCardRelatedRoute);
 app.use('/', equipmentRelatedRoute);
@@ -28,7 +26,9 @@ app.use('/', profileRoute);
 app.use('/', abilityRoute);
 app.use('/', cardRoute);
 // app.use('/', kingdomRoute);
-
+app.get('/api/minVersion', (req, res) => {
+  res.json({ version: '0.11.0' });
+});
 
 // Call the connectDB function to establish a MongoDB connection.
 connectDB();
@@ -40,6 +40,3 @@ app.use(express.json({ extended: false }));
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
-
-
-// ... Rest of your application code
