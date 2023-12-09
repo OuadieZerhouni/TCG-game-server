@@ -16,7 +16,7 @@ class DeckService {
       const createdDeck = await newDeck.save();
       return createdDeck;
     } catch (error) {
-      throw new Error('Unable to create deck');
+      throw new Error('Unable to create deck: ' + error.message); // Include the actual error message
     }
   }
 
@@ -31,7 +31,7 @@ class DeckService {
       const deck = await Deck.findById(deckId).exec();
       return deck;
     } catch (error) {
-      throw new Error('Unable to find deck by ID');
+      throw new Error('Unable to find deck by ID: ' + error.message); // Include the actual error message
     }
   }
 
@@ -49,7 +49,7 @@ class DeckService {
       }).exec();
       return updatedDeck;
     } catch (error) {
-      throw new Error('Unable to update deck');
+      throw new Error('Unable to update deck: ' + error.message); // Include the actual error message
     }
   }
 
@@ -64,7 +64,7 @@ class DeckService {
       const deletedDeck = await Deck.findByIdAndDelete(deckId).exec();
       return deletedDeck !== null;
     } catch (error) {
-      throw new Error('Unable to delete deck');
+      throw new Error('Unable to delete deck: ' + error.message); // Include the actual error message
     }
   }
 }

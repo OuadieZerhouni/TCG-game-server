@@ -1,4 +1,5 @@
 const User = require('../models/User'); // Adjust the path as needed
+const bcrypt = require('bcrypt');
 
 /**
  * Service class for managing users in the game.
@@ -12,14 +13,20 @@ class UserService {
    */
   static async createUser(userData) {
     try {
+      userData.password = await UserService.hashPassword(userData.password);
       const newUser = new User(userData);
       const createdUser = await newUser.save();
       return createdUser;
     } catch (error) {
-      throw new Error('Unable to create user');
+      throw   new Error('Unable to create user :'+error);
     }
   }
 
+  static async hashPassword(password) {
+    const salt = await bcrypt.genSalt(10);
+    const hash = await bcrypt.hash(password, salt);
+    return hash;
+  }
   /**
    * Find a user by their ID.
    *
@@ -32,6 +39,22 @@ class UserService {
       return user;
     } catch (error) {
       throw new Error('Unable to find user by ID');
+    }
+  }
+
+  static async loginUser(userData) {
+    try {
+      const user = await User.findOne({ username: userData.username }).exec();
+      if (!user) {
+        return null;
+      }
+      const isMatch = await user.comparePassword(userData.password);
+      if (!isMatch) {
+        return null;
+      }
+      return user;
+    } catch (error) {
+      throw new Error('Unable to login user :'+error);
     }
   }
 

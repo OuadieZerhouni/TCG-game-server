@@ -6,16 +6,6 @@ const mongoose = require('mongoose');
  * @class Profile
  */
 const profileSchema = new mongoose.Schema({
-  /**
-   * The unique identifier for the profile.
-   *
-   * @property {string} id
-   * @required
-   */
-  id: {
-    type: String,
-    required: true,
-  },
 
   /**
    * The user ID associated with this profile.
@@ -54,7 +44,7 @@ const profileSchema = new mongoose.Schema({
    * @property {string} rank
    */
   rank: {
-    type: String,
+    type: Number,
   },
 
   /**

@@ -6,16 +6,6 @@ const mongoose = require('mongoose');
  * @class Deck
  */
 const deckSchema = new mongoose.Schema({
-  /**
-   * The unique identifier for the deck.
-   *
-   * @property {string} id
-   * @required
-   */
-  id: {
-    type: String,
-    required: true,
-  },
 
   /**
    * An array of user cards that belong to the deck.

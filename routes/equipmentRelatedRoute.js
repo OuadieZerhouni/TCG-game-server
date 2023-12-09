@@ -11,7 +11,7 @@ const EquipmentRelatedController = require('../controllers/equipmentRelatedContr
 
 /**
  * @swagger
- * /api/equipments/{equipmentId}/user-cards:
+ * /{equipmentId}/user-cards:
  *   get:
  *     summary: Get user cards equipped with a specific equipment.
  *     tags: [EquipmentRelated]
@@ -30,7 +30,7 @@ const EquipmentRelatedController = require('../controllers/equipmentRelatedContr
  *       500:
  *         description: Internal server error.
  */
-router.get('/api/equipments/:equipmentId/user-cards', EquipmentRelatedController.getEquippedUserCards);
+router.get('/:equipmentId/user-cards', EquipmentRelatedController.getEquippedUserCards);
 
 
 module.exports = router;

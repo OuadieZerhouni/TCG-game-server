@@ -11,7 +11,7 @@ const ProfileController = require('../controllers/profileController');
 
 /**
  * @swagger
- * /api/profiles:
+ * /:
  *   get:
  *     summary: Get a list of all user profiles.
  *     tags: [Profiles]
@@ -21,11 +21,11 @@ const ProfileController = require('../controllers/profileController');
  *       500:
  *         description: Internal server error.
  */
-router.get('/api/profiles', ProfileController.getAllProfiles);
+router.get('/', ProfileController.getAllProfiles);
 
 /**
  * @swagger
- * /api/profiles/{profileId}:
+ * /{profileId}:
  *   get:
  *     summary: Get a user profile by ID.
  *     tags: [Profiles]
@@ -44,11 +44,11 @@ router.get('/api/profiles', ProfileController.getAllProfiles);
  *       500:
  *         description: Internal server error.
  */
-router.get('/api/profiles/:profileId', ProfileController.getProfileById);
+router.get('/:profileId', ProfileController.getProfileById);
 
 /**
  * @swagger
- * /api/profiles:
+ * /:
  *   post:
  *     summary: Create a new user profile.
  *     tags: [Profiles]
@@ -66,11 +66,11 @@ router.get('/api/profiles/:profileId', ProfileController.getProfileById);
  *       500:
  *         description: Internal server error.
  */
-router.post('/api/profiles', ProfileController.createProfile);
+router.post('/', ProfileController.createProfile);
 
 /**
  * @swagger
- * /api/profiles/{profileId}:
+ * /{profileId}:
  *   put:
  *     summary: Update a user profile by ID.
  *     tags: [Profiles]
@@ -97,11 +97,11 @@ router.post('/api/profiles', ProfileController.createProfile);
  *       500:
  *         description: Internal server error.
  */
-router.put('/api/profiles/:profileId', ProfileController.updateProfile);
+router.put('/:profileId', ProfileController.updateProfile);
 
 /**
  * @swagger
- * /api/profiles/{profileId}:
+ * /{profileId}:
  *   delete:
  *     summary: Delete a user profile by ID.
  *     tags: [Profiles]
@@ -120,6 +120,6 @@ router.put('/api/profiles/:profileId', ProfileController.updateProfile);
  *       500:
  *         description: Internal server error.
  */
-router.delete('/api/profiles/:profileId', ProfileController.deleteProfile);
+router.delete('/:profileId', ProfileController.deleteProfile);
 
 module.exports = router;

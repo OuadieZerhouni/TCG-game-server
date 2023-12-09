@@ -11,7 +11,7 @@ const UserCardRelatedController = require('../controllers/userCardRelatedControl
 
 /**
  * @swagger
- * /api/user-cards/{userCardId}/abilities:
+ * /{userCardId}/abilities:
  *   get:
  *     summary: Get the abilities associated with a user card.
  *     tags: [UserCardRelated]
@@ -30,7 +30,7 @@ const UserCardRelatedController = require('../controllers/userCardRelatedControl
  *       500:
  *         description: Internal server error.
  */
-router.get('/api/user-cards/:userCardId/abilities', UserCardRelatedController.getUserCardAbilities);
+router.get('/:userCardId/abilities', UserCardRelatedController.getUserCardAbilities);
 
 // Add more related operations for the UserCard model here
 

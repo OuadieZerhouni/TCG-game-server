@@ -11,7 +11,7 @@ const AbilityController = require('../controllers/abilityController.js');
 
 /**
  * @swagger
- * /api/abilities:
+ * /:
  *   get:
  *     summary: Get a list of all abilities.
  *     tags: [Abilities]
@@ -21,11 +21,11 @@ const AbilityController = require('../controllers/abilityController.js');
  *       500:
  *         description: Internal server error.
  */
-router.get('/api/abilities', AbilityController.getAllAbilities);
+router.get('/', AbilityController.getAllAbilities);
 
 /**
  * @swagger
- * /api/abilities/{abilityId}:
+ * /{abilityId}:
  *   get:
  *     summary: Get an ability by ID.
  *     tags: [Abilities]
@@ -44,11 +44,11 @@ router.get('/api/abilities', AbilityController.getAllAbilities);
  *       500:
  *         description: Internal server error.
  */
-router.get('/api/abilities/:abilityId', AbilityController.getAbilityById);
+router.get('/:abilityId', AbilityController.getAbilityById);
 
 /**
  * @swagger
- * /api/abilities:
+ * /:
  *   post:
  *     summary: Create a new ability.
  *     tags: [Abilities]
@@ -66,11 +66,11 @@ router.get('/api/abilities/:abilityId', AbilityController.getAbilityById);
  *       500:
  *         description: Internal server error.
  */
-router.post('/api/abilities', AbilityController.createAbility);
+router.post('/', AbilityController.createAbility);
 
 /**
  * @swagger
- * /api/abilities/{abilityId}:
+ * /{abilityId}:
  *   put:
  *     summary: Update an ability by ID.
  *     tags: [Abilities]
@@ -97,11 +97,11 @@ router.post('/api/abilities', AbilityController.createAbility);
  *       500:
  *         description: Internal server error.
  */
-router.put('/api/abilities/:abilityId', AbilityController.updateAbility);
+router.put('/:abilityId', AbilityController.updateAbility);
 
 /**
  * @swagger
- * /api/abilities/{abilityId}:
+ * /{abilityId}:
  *   delete:
  *     summary: Delete an ability by ID.
  *     tags: [Abilities]
@@ -120,6 +120,6 @@ router.put('/api/abilities/:abilityId', AbilityController.updateAbility);
  *       500:
  *         description: Internal server error.
  */
-router.delete('/api/abilities/:abilityId', AbilityController.deleteAbility);
+router.delete('/:abilityId', AbilityController.deleteAbility);
 
 module.exports = router;

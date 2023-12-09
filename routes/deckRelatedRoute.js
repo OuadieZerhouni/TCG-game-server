@@ -11,7 +11,7 @@ const DeckRelatedController = require('../controllers/deckRelatedController.js')
 
 /**
  * @swagger
- * /api/decks/{deckId}/cards:
+ * /{deckId}/cards:
  *   get:
  *     summary: Get the cards in a specific deck.
  *     tags: [DeckRelated]
@@ -30,7 +30,7 @@ const DeckRelatedController = require('../controllers/deckRelatedController.js')
  *       500:
  *         description: Internal server error.
  */
-router.get('/api/decks/:deckId/cards', DeckRelatedController.getDeckCards);
+router.get('/:deckId/cards', DeckRelatedController.getDeckCards);
 
 // Add more related operations for the Deck model here
 

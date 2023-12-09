@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
 
 /**
  * Represents a user of the game.
@@ -14,7 +15,8 @@ const userSchema = new mongoose.Schema({
    */
   email: {
     type: String,
-    required: true,
+    required: false,
+    unique: true,
   },
 
   /**
@@ -26,6 +28,7 @@ const userSchema = new mongoose.Schema({
   username: {
     type: String,
     required: true,
+    unique: true,
   },
 
   /**
@@ -82,5 +85,11 @@ const userSchema = new mongoose.Schema({
  * @typedef {Model<User>} UserModel
  */
 const User = mongoose.model('User', userSchema);
+
+User.prototype.comparePassword = async function (candidatePassword) {
+  const isMatch = await bcrypt.compare(candidatePassword, this.password);
+  return isMatch;
+}
+
 
 module.exports = User;

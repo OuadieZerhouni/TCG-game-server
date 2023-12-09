@@ -12,7 +12,7 @@ const { checkJwt } = require('../middlewares/authMiddleware.js');
 
 /**
  * @swagger
- * /api/users:
+ * :
  *   get:
  *     summary: Get a list of all users.
  *     tags: [Users]
@@ -22,11 +22,11 @@ const { checkJwt } = require('../middlewares/authMiddleware.js');
  *       500:
  *         description: Internal server error.
  */
-router.get('/api/users', UserController.getAllUsers);
+router.get('/', UserController.getAllUsers);
 
 /**
  * @swagger
- * /api/users/{userId}:
+ * /{userId}:
  *   get:
  *     summary: Get a user by ID.
  *     tags: [Users]
@@ -45,11 +45,12 @@ router.get('/api/users', UserController.getAllUsers);
  *       500:
  *         description: Internal server error.
  */
-router.get('/api/users/:userId', UserController.getUserById);
+router.get('/:userId', UserController.getUserById);
 
+router.post('/login', UserController.loginUser);
 /**
  * @swagger
- * /api/users:
+ * :
  *   post:
  *     summary: Create a new user.
  *     tags: [Users]
@@ -67,11 +68,14 @@ router.get('/api/users/:userId', UserController.getUserById);
  *       500:
  *         description: Internal server error.
  */
-router.post('/api/users', UserController.createUser);
+router.post('/',
+UserController.createUser);
+
+
 
 /**
  * @swagger
- * /api/users/{userId}:
+ * /{userId}:
  *   put:
  *     summary: Update a user by ID.
  *     tags: [Users]
@@ -98,11 +102,11 @@ router.post('/api/users', UserController.createUser);
  *       500:
  *         description: Internal server error.
  */
-router.put('/api/users/:userId', UserController.updateUser);
+router.put('/:userId', UserController.updateUser);
 
 /**
  * @swagger
- * /api/users/{userId}:
+ * /{userId}:
  *   delete:
  *     summary: Delete a user by ID.
  *     tags: [Users]
@@ -121,6 +125,6 @@ router.put('/api/users/:userId', UserController.updateUser);
  *       500:
  *         description: Internal server error.
  */
-router.delete('/api/users/:userId', UserController.deleteUser);
+router.delete('/:userId', UserController.deleteUser);
 
 module.exports = router;

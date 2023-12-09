@@ -11,7 +11,7 @@ const CardController = require('../controllers/cardController.js');
 
 /**
  * @swagger
- * /api/cards:
+ * /:
  *   get:
  *     summary: Get a list of all cards.
  *     tags: [Cards]
@@ -21,11 +21,11 @@ const CardController = require('../controllers/cardController.js');
  *       500:
  *         description: Internal server error.
  */
-router.get('/api/cards', CardController.getAllCards);
+router.get('/', CardController.getAllCards);
 
 /**
  * @swagger
- * /api/cards/{cardId}:
+ * /{cardId}:
  *   get:
  *     summary: Get a card by ID.
  *     tags: [Cards]
@@ -44,11 +44,11 @@ router.get('/api/cards', CardController.getAllCards);
  *       500:
  *         description: Internal server error.
  */
-router.get('/api/cards/:cardId', CardController.getCardById);
+router.get('/:cardId', CardController.getCardById);
 
 /**
  * @swagger
- * /api/cards:
+ * /:
  *   post:
  *     summary: Create a new card.
  *     tags: [Cards]
@@ -66,11 +66,11 @@ router.get('/api/cards/:cardId', CardController.getCardById);
  *       500:
  *         description: Internal server error.
  */
-router.post('/api/cards', CardController.createCard);
+router.post('/', CardController.createCard);
 
 /**
  * @swagger
- * /api/cards/{cardId}:
+ * /{cardId}:
  *   put:
  *     summary: Update a card by ID.
  *     tags: [Cards]
@@ -97,11 +97,11 @@ router.post('/api/cards', CardController.createCard);
  *       500:
  *         description: Internal server error.
  */
-router.put('/api/cards/:cardId', CardController.updateCard);
+router.put('/:cardId', CardController.updateCard);
 
 /**
  * @swagger
- * /api/cards/{cardId}:
+ * /{cardId}:
  *   delete:
  *     summary: Delete a card by ID.
  *     tags: [Cards]
@@ -120,6 +120,6 @@ router.put('/api/cards/:cardId', CardController.updateCard);
  *       500:
  *         description: Internal server error.
  */
-router.delete('/api/cards/:cardId', CardController.deleteCard);
+router.delete('/:cardId', CardController.deleteCard);
 
 module.exports = router;
