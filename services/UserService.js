@@ -1,4 +1,4 @@
-const User = require('../models/User'); // Adjust the path as needed
+const User = require('../models/user'); // Adjust the path as needed
 const bcrypt = require('bcrypt');
 
 /**
@@ -39,6 +39,39 @@ class UserService {
       return user;
     } catch (error) {
       throw new Error('Unable to find user by ID');
+    }
+  }
+
+  /**
+   * Finds a user by their email.
+   *
+   * @param {string} email - The email of the user to find.
+   * @returns {Promise<User>} The user object if found, otherwise throws an error.
+   * @throws {Error} When unable to find the user.
+   */
+  static async findUserByEmail(email) {
+    try {
+      email = email.toLowerCase();
+      const user = await User.findOne({ email: email }).exec();
+      return user;
+    } catch (error) {
+      throw new Error('Unable to find user by email' + error);
+    }
+  }
+
+  /**
+   * Finds a user by their username.
+   *
+   * @param {string} username - The username of the user to find.
+   * @returns {Promise<User>} The user object if found, otherwise throws an error.
+   * @throws {Error} When unable to find the user.
+   */
+  static async findUserByUsername(username) {
+    try {
+      const user = await User.findOne({ username: { $regex: new RegExp("^" + username + "$", "i") } }).exec();
+      return user;
+    } catch (error) {
+      throw new Error('Unable to find user by username' + error);
     }
   }
 

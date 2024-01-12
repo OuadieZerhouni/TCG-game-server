@@ -1,5 +1,5 @@
-const Profile = require('../models/Profile'); // Adjust the path as needed
-const DeckService = require('./DeckService'); // Adjust the path as needed
+const Profile = require('../models/profile'); // Adjust the path as needed
+const DeckService = require('./deckService'); // Adjust the path as needed
 
 /**
  * Service class for managing user profiles in the game.

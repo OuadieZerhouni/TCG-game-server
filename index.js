@@ -2,41 +2,49 @@ const connectDB = require('./database'); // Replace with the actual path to your
 const express = require('express');
 const app = express();
 const port = 3000;
+const cors = require('cors');
+const corsOptions = {
+  origin: '*',
+  credentials: true,
+};
+app.use(cors(corsOptions));
+
 const {checkJwt} = require('./middlewares/authMiddleware');
 
 // Add the ability to parse JSON.
 app.use(express.json({ extended: false }));
 
 // Import the routes.
-const userCardRelatedRoute = require('./routes/userCardRelatedRoute');
+const abilityRoute          = require('./routes/abilityRoute');
+const cardRoute             = require('./routes/cardRoute');
+// const deckRoute          = require('./routes/deckRoute');
+const deckRelatedRoute      = require('./routes/deckRelatedRoute');
 const equipmentRelatedRoute = require('./routes/equipmentRelatedRoute');
-const deckRelatedRoute = require('./routes/deckRelatedRoute');
-const userRoute = require('./routes/userRoute');
-const profileRoute = require('./routes/profileRoute');
-const abilityRoute = require('./routes/abilityRoute');
-const cardRoute = require('./routes/cardRoute');
-// const kingdomRoute = require('./routes/kingdomRoute');
-// const shopRoute = require('./routes/shopRoute');
-// const userCardRoute = require('./routes/userCardRoute');
-// const equipmentRoute = require('./routes/equipmentRoute');
-// const deckRoute = require('./routes/deckRoute');
-
+// const equipmentRoute     = require('./routes/equipmentRoute');
+// const profileRoute       = require('./routes/profileRoute');
+// const kingdomRoute       = require('./routes/kingdomRoute');
+const roomRoute             = require('./routes/roomRoute');
+// const shopRoute          = require('./routes/shopRoute');
+const userRoute             = require('./routes/userRoute');
+// const userCardRoute      = require('./routes/userCardRoute');
+const userCardRelatedRoute  = require('./routes/userCardRelatedRoute');
 app.get('/api/authCheck',
  (req, res) => {
   res.status(200).json({ isAuth: true });
 });
 // Register the routes.
-app.use('/api/user-cards', userCardRelatedRoute);
-app.use('/api/equipments', equipmentRelatedRoute);
-app.use('/api/decks', deckRelatedRoute);
-app.use('/api/users', userRoute);
-app.use('/api/profiles', profileRoute);
-app.use('/api/abilities', abilityRoute);
-app.use('/api/cards', cardRoute);
-// app.use('/', kingdomRoute);
 app.get('/api/minVersion', (req, res) => {
+// app.use('/', kingdomRoute);
   res.json({ version: '0.1.0' });
 });
+app.use('/api/abilities', abilityRoute);
+app.use('/api/cards', cardRoute);
+app.use('/api/decks', deckRelatedRoute);
+app.use('/api/equipments', equipmentRelatedRoute);
+// app.use('/api/profiles', profileRoute);
+app.use('/api/room', roomRoute);
+app.use('/api/user-cards', userCardRelatedRoute);
+app.use('/api/users', userRoute);
 
 // default route
 app.get('/', (req, res) => {

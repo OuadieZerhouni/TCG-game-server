@@ -13,7 +13,8 @@ const userCardSchema = new mongoose.Schema({
    * @required
    */
   cardId: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Card',
     required: true,
   },
 
@@ -34,7 +35,7 @@ const userCardSchema = new mongoose.Schema({
    * @property {number} defence
    * @required
    */
-  defence: {
+  blood: {
     type: Number,
     required: true,
   },
@@ -48,6 +49,7 @@ const userCardSchema = new mongoose.Schema({
   xp: {
     type: Number,
     required: true,
+    default: 0,
   },
 
   /**
@@ -59,6 +61,7 @@ const userCardSchema = new mongoose.Schema({
   level: {
     type: Number,
     required: true,
+    default: 1,
   },
 
   /**

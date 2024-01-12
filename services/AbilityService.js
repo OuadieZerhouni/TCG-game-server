@@ -1,4 +1,4 @@
-const Ability = require('../models/Ability');
+const Ability = require('../models/ability');
 
 /**
  * Service class for managing abilities in the game.

@@ -1,4 +1,4 @@
-const Deck = require('../models/Deck'); // Adjust the path as needed
+const Deck = require('../models/deck'); // Adjust the path as needed
 
 /**
  * Service class for managing decks in the game.

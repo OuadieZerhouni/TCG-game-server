@@ -1,4 +1,3 @@
-const ProfileService = require('../services/ProfileService');
 const UserService = require('../services/userService');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
@@ -41,7 +40,7 @@ class UserController {
       } else {
         const payload = {
           user: {
-            id: user.id,
+            _id: user._id,
           },
         };
         const  userData = {
@@ -53,19 +52,20 @@ class UserController {
           avatar: user.avatar,
         }
 
-        const userProfile = await ProfileService.findProfileByUserId(user.id);
-        if (userProfile) {
-          userData.deck = userProfile.deck;
-          userData.kingdomId = userProfile.kingdomId;
-          userData.rank = userProfile.rank;
-        }
+        // const userProfile = await ProfileService.findProfileByUserId(user.id);
+        // if (userProfile) {
+        //   userData.deck = userProfile.deck;
+        //   userData.kingdomId = userProfile.kingdomId;
+        //   userData.rank = userProfile.rank;
+        // }
         jwt.sign(
           payload,
           process.env.JWT_SECRET,
           { expiresIn: 360000 },
           (err, token) => {
             if (err) throw err;
-            res.status(200).json({ token , user: userData, profile: userProfile });
+            console.log('------userData',token);
+            res.status(200).json({ token , user: userData});
           }
         );
       }
@@ -105,16 +105,15 @@ class UserController {
    */
   static async createUser(req, res) {
     try {
-      const userData       = req.body;
+      let userData       = req.body;
+      initUserData= {
+      rank: -1,
+      quote: '',
+      diamondAmount: 100,
+      goldAmount: 10000,
+      equipments: []}
+      userData = {...userData, ...initUserData}
       const createdUser    = await UserService.createUser(userData);
-      const createdProfile = await ProfileService.createProfile({
-        userId: createdUser.id,
-        rank: -1,
-        quote: '',
-        diamondAmount: 100,
-        goldAmount: 10000,
-        equipments: [],
-      });
 
       createdUser.password = undefined;
 
@@ -137,6 +136,36 @@ class UserController {
       res.status(500).send('Internal Server Error');
     }
   }
+
+
+  /**
+   * Check if a user exists by email and username.
+   *
+   * @param {Request} req - Express request object.
+   * @param {Response} res - Express response object.
+   */
+  static async checkUserExist(req, res) {
+    const { email, username } = req.body;
+
+    try {
+      // Check if email and username exist in the database
+      const existingUserByEmail = await UserService.findUserByEmail(email);
+      const existingUserByUsername = await UserService.findUserByUsername(username);
+
+      if (existingUserByEmail && existingUserByUsername) {
+        return res.status(400).json({ message: 'Email and username already exist' });
+      } else if (existingUserByUsername) {
+        return res.status(400).json({ message: 'Username already exist' });
+      } else if (existingUserByEmail) {
+        return res.status(400).json({ message: 'Email already used' });
+      } else {
+        return res.status(200).json({ message: 'User is new' });
+      }
+    } catch (error) {
+      console.error('Error checking user existence:', error);
+      return res.status(500).json({ message: 'Internal server error' });
+    }
+  };
 
   /**
    * Update a user by ID.

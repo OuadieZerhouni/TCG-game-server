@@ -1,4 +1,4 @@
-const UserCard = require('../models/UserCard'); // Adjust the path as needed
+const UserCard = require('../models/userCard'); // Adjust the path as needed
 
 /**
  * Service class for managing user cards in the game.

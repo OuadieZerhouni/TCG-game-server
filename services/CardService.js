@@ -1,4 +1,4 @@
-const Card = require('../models/Card');
+const Card = require('../models/card');
 
 /**
  * Service class for managing cards in the game.
@@ -65,6 +65,20 @@ class CardService {
       return deletedCard !== null;
     } catch (error) {
       throw new Error('Unable to delete card');
+    }
+  }
+
+  /**
+   * Get all cards.
+   *
+   * @returns {Promise<Card[]>} - The list of cards.
+   */
+  static async getAllCards() {
+    try {
+      const cards = await Card.find().exec();
+      return cards;
+    } catch (error) {
+      throw new Error('Unable to get all cards');
     }
   }
 }
