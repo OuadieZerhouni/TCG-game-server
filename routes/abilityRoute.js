@@ -1,7 +1,9 @@
 const express = require('express');
+const multer = require('multer');
 const router = express.Router();
 const AbilityController = require('../controllers/abilityController.js');
-
+// Configure multer for file handling
+const upload = multer({ storage: multer.memoryStorage() });
 /**
  * @swagger
  * tags:
@@ -66,7 +68,7 @@ router.get('/:abilityId', AbilityController.getAbilityById);
  *       500:
  *         description: Internal server error.
  */
-router.post('/', AbilityController.createAbility);
+router.post('/', upload.single('image'), AbilityController.createAbility);
 
 /**
  * @swagger

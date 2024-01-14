@@ -16,7 +16,7 @@ class AbilityService {
       const createdAbility = await newAbility.save();
       return createdAbility;
     } catch (error) {
-      throw new Error('Unable to create ability');
+      throw new Error('Unable to create ability : ' + error);
     }
   }
 
@@ -32,6 +32,19 @@ class AbilityService {
       return ability;
     } catch (error) {
       throw new Error('Unable to find ability by ID');
+    }
+  }
+
+  /**
+   * Get a list of all abilities.
+   * @returns {Promise<Ability[]>} - A list of all abilities.
+   */
+  static async getAllAbilities() {
+    try {
+      const abilities = await Ability.find().exec();
+      return abilities;
+    } catch (error) {
+      throw new Error('Unable to get all abilities');
     }
   }
 
@@ -64,7 +77,7 @@ class AbilityService {
   static async deleteAbility(abilityId) {
     try {
       const deletedAbility = await Ability.findByIdAndDelete(abilityId).exec();
-      return deletedAbility !== null;
+      return deletedAbility;
     } catch (error) {
       throw new Error('Unable to delete ability');
     }

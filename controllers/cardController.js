@@ -1,4 +1,9 @@
 const CardService = require('../services/cardService');
+const fs = require('fs');
+const path = require('path');
+const util = require('util');
+const writeFileAsync = util.promisify(fs.writeFile);
+
 
 /**
  * Controller for managing card operations.
@@ -54,6 +59,21 @@ class CardController {
     try {
       const cardData = req.body;
       const createdCard = await CardService.createCard(cardData);
+      console.log(req.file);
+      // Save the image data as a PNG file with the function name as the filename
+      if (req.file) {
+        // Remove the data URI prefix and decode the base64 string
+        const base64Image = req.file.buffer.toString('utf8').replace(/^data:image\/\w+;base64,/, '');
+        const imageBuffer = Buffer.from(base64Image, 'base64');
+
+        const imagePath = path.join(__dirname, `../data/cards/${createdCard.name}.png`);
+
+        // Write the decoded buffer to a file
+        await writeFileAsync(imagePath, imageBuffer);
+
+        // Include the image path in the response if needed
+        createdCard.image = imagePath;
+      }
       res.status(201).json(createdCard);
     } catch (error) {
       console.error(error);
@@ -98,6 +118,9 @@ class CardController {
       if (!deleted) {
         res.status(404).send('Card not found');
       } else {
+        //delete image file
+        const imagePath = path.join(__dirname, `../data/cards/${deleted.name}.png`);
+        fs.unlinkSync(imagePath);
         res.status(204).send('Card deleted successfully');
       }
     } catch (error) {

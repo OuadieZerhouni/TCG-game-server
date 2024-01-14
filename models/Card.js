@@ -52,15 +52,16 @@ const cardSchema = new mongoose.Schema({
 
   /**
    * An array of ability IDs associated with the card.
+   * type array of _id from Ability model
    *
-   * @property {string[]} abilities
+   * @property {array} abilities
    * @required
    */
   abilities: {
     type: [String],
+    ref: 'Ability',
     required: true,
   },
-
   /**
    * The price of the card in the in-game currency.
    *

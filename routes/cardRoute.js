@@ -1,6 +1,15 @@
 const express = require('express');
 const router = express.Router();
+const multer = require('multer');
 const CardController = require('../controllers/cardController.js');
+
+// Configure multer for file handling
+const upload = multer({
+    storage: multer.memoryStorage(), limits: {
+        fieldSize: 1024 * 1024 * 10, // 10MB for fields (adjust as needed)
+        fileSize: 1024 * 1024 * 10, // 10MB for files (adjust as needed)
+    },
+});
 
 /**
  * @swagger
@@ -66,7 +75,7 @@ router.get('/:cardId', CardController.getCardById);
  *       500:
  *         description: Internal server error.
  */
-router.post('/', CardController.createCard);
+router.post('/', upload.single('image'), CardController.createCard);
 
 /**
  * @swagger

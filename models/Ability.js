@@ -7,17 +7,6 @@ const mongoose = require('mongoose');
  */
 const abilitySchema = new mongoose.Schema({
   /**
-   * The unique identifier for the ability.
-   *
-   * @property {string} id
-   * @required
-   */
-  id: {
-    type: String,
-    required: true,
-  },
-
-  /**
    * The name of the JavaScript function associated with this ability.
    *
    * @property {string} functionName

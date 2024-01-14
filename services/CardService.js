@@ -62,7 +62,7 @@ class CardService {
   static async deleteCard(cardId) {
     try {
       const deletedCard = await Card.findByIdAndDelete(cardId).exec();
-      return deletedCard !== null;
+      return deletedCard;
     } catch (error) {
       throw new Error('Unable to delete card');
     }

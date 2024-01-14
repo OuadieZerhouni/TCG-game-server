@@ -24,6 +24,7 @@ router.post('/', async (req, res) => {
             const deck1 = DeckService.findDeckById(player1.deck);
             const deck2 = DeckService.findDeckById(level.deck);
             const roomId = uuidv4();
+            console.log(roomId);
             const room = new Room(roomId, player1.id, null, 1, 0, new Date(), deck1, deck2, 2000, 2000);
             res.status(201).json({ roomId: roomId });
         }
