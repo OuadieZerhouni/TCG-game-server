@@ -21,8 +21,9 @@ const cardRoute             = require('./routes/cardRoute');
 const deckRelatedRoute      = require('./routes/deckRelatedRoute');
 const equipmentRelatedRoute = require('./routes/equipmentRelatedRoute');
 // const equipmentRoute     = require('./routes/equipmentRoute');
-// const profileRoute       = require('./routes/profileRoute');
 // const kingdomRoute       = require('./routes/kingdomRoute');
+const levelRoute            = require('./routes/levelRoute');
+// const profileRoute       = require('./routes/profileRoute');
 const roomRoute             = require('./routes/roomRoute');
 // const shopRoute          = require('./routes/shopRoute');
 const userRoute             = require('./routes/userRoute');
@@ -41,6 +42,7 @@ app.use('/api/abilities', abilityRoute);
 app.use('/api/cards', cardRoute);
 app.use('/api/decks', deckRelatedRoute);
 app.use('/api/equipments', equipmentRelatedRoute);
+app.use('/api/levels', levelRoute);
 // app.use('/api/profiles', profileRoute);
 app.use('/api/room', roomRoute);
 app.use('/api/user-cards', userCardRelatedRoute);
@@ -49,7 +51,7 @@ app.use('/api/users', userRoute);
 // default route
 app.get('/', (req, res) => {
   // header 404
-  res.status(404).send('Page not found');
+  res.status(404).send('route not found');
 });
 // Call the connectDB function to establish a MongoDB connection.
 connectDB();

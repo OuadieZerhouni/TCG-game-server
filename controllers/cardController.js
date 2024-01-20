@@ -118,9 +118,11 @@ class CardController {
       if (!deleted) {
         res.status(404).send('Card not found');
       } else {
-        //delete image file
         const imagePath = path.join(__dirname, `../data/cards/${deleted.name}.png`);
-        fs.unlinkSync(imagePath);
+        //unlink file if exists
+        if (fs.existsSync(imagePath)) {
+          fs.unlinkSync(imagePath);
+        }
         res.status(204).send('Card deleted successfully');
       }
     } catch (error) {

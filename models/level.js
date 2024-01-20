@@ -7,70 +7,59 @@ const mongoose = require('mongoose');
  */
 const levelSchema = new mongoose.Schema({
 
-    /**
-     * The major level of something.
-     * @type {Number}
-     * @required
-     */
-    majorLevel: {
-        type: Number,
-        required: true,
-    },
-
-    /**
-     * The minor level of something.
-     * @type {Number}
-     * @required
-     */
-    minorLevel: {
-        type: Number,
-        required: true,
-    },
-
-    /**
-     * The diamond reward for completing the level.
-     * @type {Number}
-     * @required
-     * @default 0
-     */
-    diamondReward: {
-        type: Number,
-        required: true,
-        default: 0,
-    },
-
-    /**
-     * The gold reward for completing the level.
-     * @type {Number}
-     * @required
-     * @default 100
-     */
-    goldReward: {
-        type: Number,
-        required: true,
-        default: 100,
-    },
-
-    /**
-     * The deck associated with the level.
-     *
-     * @property {Deck} deck
-     */
-    deck: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Deck',
+  /**
+   * The major level of something.
+   * @type {Number}
+   * @required
+   */
+  majorLevel: {
+    type: Number,
+    required: true,
   },
-
 
   /**
-   * A quote associated with the level.
-   *
-   * @property {string} quote
+   * The minor level of something.
+   * @type {Number}
+   * @required
    */
-  quote: {
-    type: String,
+  minorLevel: {
+    type: Number,
+    required: true,
   },
 
+  /**
+   * The diamond reward for completing the level.
+   * @type {Number}
+   * @required
+   * @default 0
+   */
+  diamondReward: {
+    type: Number,
+    required: true,
+    default: 0,
+  },
+
+  /**
+   * The gold reward for completing the level.
+   * @type {Number}
+   * @required
+   * @default 100
+   */
+  goldReward: {
+    type: Number,
+    required: true,
+    default: 100,
+  },
+
+  /**
+   * The deck associated with the level.
+   *
+   * @property {Deck} deck
+   */
+  deck: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Deck',
+  },
 
   /**
    * An array of equipment IDs associated with the level.

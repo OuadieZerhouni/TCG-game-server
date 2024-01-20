@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const Level = require('../models/Level'); // Adjust the import path as needed
+const Level = require('../models/level'); // Adjust the import path as needed
 
 /**
  * Create a new level.
@@ -33,6 +33,21 @@ const getLevelById = async (levelId) => {
         throw error;
     }
 };
+
+/**
+ * getAllLevels
+ * @returns {Promise<Level[]>} The retrieved levels.
+ * @throws {Error} If there is an error while retrieving the levels.
+ */
+const getAllLevels = async () => {
+    try {
+        const levels = await Level.find().populate('deck equipments');
+        return levels;
+    } catch (error) {
+        throw error;
+    }
+}
+
 /**
  * Retrieve a level by its major and minor level number.
  * @param {string} levelInfo - The level info to retrieve.
@@ -76,7 +91,7 @@ const updateLevelById = async (levelId, newData) => {
  */
 const deleteLevelById = async (levelId) => {
     try {
-        await Level.findByIdAndRemove(levelId);
+        await Level.findByIdAndDelete(levelId);
     } catch (error) {
         throw error;
     }
@@ -84,6 +99,7 @@ const deleteLevelById = async (levelId) => {
 
 module.exports = {
     createLevel,
+    getAllLevels,
     getLevelById,
     findLevelByStringId,
     updateLevelById,
