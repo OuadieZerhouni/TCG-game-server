@@ -79,6 +79,6 @@ const levelSchema = new mongoose.Schema({
  *
  * @typedef {Model<Profile>} ProfileModel
  */
-const Level = mongoose.model('Profile', levelSchema);
+const Level = mongoose.model('Level', levelSchema);
 
 module.exports = Level;

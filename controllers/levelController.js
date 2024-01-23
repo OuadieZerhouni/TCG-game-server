@@ -47,6 +47,7 @@ const createLevel = async (req, res) => {
   try {
     // create anb empty deck for the level
     const deck = await deckService.createDeck({cards: [], totalPower: 0});
+    levelData.deck = deck._id;
     const newLevel = await levelService.createLevel(levelData);
     res.status(201).json(newLevel);
   } catch (error) {

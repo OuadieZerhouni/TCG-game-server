@@ -11,7 +11,7 @@ const DeckController = require('../controllers/deckController.js');
 
 /**
  * @swagger
- * /api/decks:
+ * /:
  *   get:
  *     summary: Get a list of all decks.
  *     tags: [Decks]
@@ -21,11 +21,11 @@ const DeckController = require('../controllers/deckController.js');
  *       500:
  *         description: Internal server error.
  */
-router.get('/api/decks', DeckController.getAllDecks);
+router.get('/', DeckController.getAllDecks);
 
 /**
  * @swagger
- * /api/decks/{deckId}:
+ * //{deckId}:
  *   get:
  *     summary: Get a deck by ID.
  *     tags: [Decks]
@@ -44,11 +44,11 @@ router.get('/api/decks', DeckController.getAllDecks);
  *       500:
  *         description: Internal server error.
  */
-router.get('/api/decks/:deckId', DeckController.getDeckById);
+router.get('/:deckId', DeckController.getDeckById);
 
 /**
  * @swagger
- * /api/decks:
+ * /:
  *   post:
  *     summary: Create a new deck.
  *     tags: [Decks]
@@ -66,11 +66,11 @@ router.get('/api/decks/:deckId', DeckController.getDeckById);
  *       500:
  *         description: Internal server error.
  */
-router.post('/api/decks', DeckController.createDeck);
+router.post('/', DeckController.createDeck);
 
 /**
  * @swagger
- * /api/decks/{deckId}:
+ * //{deckId}:
  *   put:
  *     summary: Update a deck by ID.
  *     tags: [Decks]
@@ -97,11 +97,11 @@ router.post('/api/decks', DeckController.createDeck);
  *       500:
  *         description: Internal server error.
  */
-router.put('/api/decks/:deckId', DeckController.updateDeck);
+router.put('/:deckId', DeckController.updateDeck);
 
 /**
  * @swagger
- * /api/decks/{deckId}:
+ * //{deckId}:
  *   delete:
  *     summary: Delete a deck by ID.
  *     tags: [Decks]
@@ -120,6 +120,6 @@ router.put('/api/decks/:deckId', DeckController.updateDeck);
  *       500:
  *         description: Internal server error.
  */
-router.delete('/api/decks/:deckId', DeckController.deleteDeck);
+router.delete('/:deckId', DeckController.deleteDeck);
 
 module.exports = router;

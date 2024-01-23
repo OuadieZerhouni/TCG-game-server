@@ -17,8 +17,8 @@ app.use(express.json({ extended: false }));
 // Import the routes.
 const abilityRoute          = require('./routes/abilityRoute');
 const cardRoute             = require('./routes/cardRoute');
-// const deckRoute          = require('./routes/deckRoute');
-const deckRelatedRoute      = require('./routes/deckRelatedRoute');
+const deckRoute          = require('./routes/deckRoute');
+// const deckRelatedRoute      = require('./routes/deckRelatedRoute');
 const equipmentRelatedRoute = require('./routes/equipmentRelatedRoute');
 // const equipmentRoute     = require('./routes/equipmentRoute');
 // const kingdomRoute       = require('./routes/kingdomRoute');
@@ -40,7 +40,7 @@ app.get('/api/minVersion', (req, res) => {
 });
 app.use('/api/abilities', abilityRoute);
 app.use('/api/cards', cardRoute);
-app.use('/api/decks', deckRelatedRoute);
+app.use('/api/decks', deckRoute);
 app.use('/api/equipments', equipmentRelatedRoute);
 app.use('/api/levels', levelRoute);
 // app.use('/api/profiles', profileRoute);
