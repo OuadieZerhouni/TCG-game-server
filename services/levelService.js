@@ -1,5 +1,12 @@
+/* Author: Ouadie ZERHOUNI
+   Creation Date: 2024-01-28 01:22:08 */
+
+/* Author: Ouadie ZERHOUNI
+   Creation Date: 2024-01-28 01:21:48 */
+
 const mongoose = require('mongoose');
 const Level = require('../models/level'); // Adjust the import path as needed
+const { populate } = require('../models/deck');
 
 /**
  * Create a new level.
@@ -41,7 +48,16 @@ const getLevelById = async (levelId) => {
  */
 const getAllLevels = async () => {
     try {
-        const levels = await Level.find().populate('deck equipments');
+        // populate the cards inside deck
+        const levels = await Level.find()
+            .populate('equipments deck')
+            .populate({
+                path: 'deck',
+                populate: {
+                    path: 'cards',
+                    model: 'UserCard',
+                },
+            });
         return levels;
     } catch (error) {
         throw error;
@@ -57,7 +73,13 @@ const getAllLevels = async () => {
 const findLevelByStringId = async (levelInfo) => {
     try {
         const {majorLevel, minorLevel} = levelInfo.split('-');
-        const level = await Level.findOne({majorLevel, minorLevel}).populate('deck equipments');
+        const level = await Level.findOne({majorLevel, minorLevel}).populate('deck equipments').populate({
+            path: 'deck',
+            populate: {
+                path: 'cards',
+                model: 'UserCard'
+            }
+        });
         return level;
     }
     catch (error) {

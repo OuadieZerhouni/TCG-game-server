@@ -1,3 +1,7 @@
+/* Author: Ouadie ZERHOUNI
+   Creation Date: 2024-01-28 01:22:07 */
+
+
 const connectDB = require('./database'); // Replace with the actual path to your connection file.
 const express = require('express');
 const app = express();
@@ -38,6 +42,9 @@ app.get('/api/minVersion', (req, res) => {
 // app.use('/', kingdomRoute);
   res.json({ version: '0.1.0' });
 });
+// app.use('/api/abilities', abilityRoute);
+app.use('/data', express.static(__dirname + '/data'));
+
 app.use('/api/abilities', abilityRoute);
 app.use('/api/cards', cardRoute);
 app.use('/api/decks', deckRoute);

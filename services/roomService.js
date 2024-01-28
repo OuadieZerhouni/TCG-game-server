@@ -1,3 +1,9 @@
+/* Author: Ouadie ZERHOUNI
+   Creation Date: 2024-01-28 01:22:08 */
+
+/* Author: Ouadie ZERHOUNI
+   Creation Date: 2024-01-28 01:21:48 */
+
 const Room = require('./models/Room'); // Adjust the path to your Room model file as needed
 
 // Create a new room and save it to the database

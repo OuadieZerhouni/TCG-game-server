@@ -1,3 +1,9 @@
+/* Author: Ouadie ZERHOUNI
+   Creation Date: 2024-01-28 01:22:08 */
+
+/* Author: Ouadie ZERHOUNI
+   Creation Date: 2024-01-28 01:21:47 */
+
 const Deck = require('../models/deck'); // Adjust the path as needed
 
 /**
@@ -19,6 +25,20 @@ class DeckService {
       throw new Error('Unable to create deck: ' + error.message); // Include the actual error message
     }
   }
+
+  /**
+   * Get a list of all decks.
+   * @returns {Promise<Deck[]>} - The retrieved decks.
+   */
+  static async getAllDecks() {
+    try {
+      const decks = await Deck.find().populate('cards');
+      return decks;
+    } catch (error) {
+      throw new Error('Unable to retrieve decks: ' + error.message); // Include the actual error message
+    }
+  }
+
 
   /**
    * Find a deck by its ID.

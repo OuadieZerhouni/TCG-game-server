@@ -1,3 +1,9 @@
+/* Author: Ouadie ZERHOUNI
+   Creation Date: 2024-01-28 01:22:08 */
+
+/* Author: Ouadie ZERHOUNI
+   Creation Date: 2024-01-28 01:21:48 */
+
 const UserCard = require('../models/userCard'); // Adjust the path as needed
 
 /**
