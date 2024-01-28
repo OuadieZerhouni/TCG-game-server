@@ -72,7 +72,8 @@ const getAllLevels = async () => {
  */
 const findLevelByStringId = async (levelInfo) => {
     try {
-        const {majorLevel, minorLevel} = levelInfo.split('-');
+        const majorLevel= levelInfo.split('-')[0];
+        const minorLevel= levelInfo.split('-')[1];
         const level = await Level.findOne({majorLevel, minorLevel}).populate('deck equipments').populate({
             path: 'deck',
             populate: {

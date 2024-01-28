@@ -83,73 +83,73 @@ const userSchema = new mongoose.Schema({
   avatar: {
     type: String,
   },
-    /**
-     * The deck associated with the user.
-     *
-     * @property {Deck} deck
-     */
-    deck: {
+  /**
+   * The deck associated with the user.
+   *
+   * @property {Deck} deck
+   */
+  deck: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Deck',
+  },
+
+  /**
+   * The kingdom ID associated with the user (nullable).
+   *
+   * @property {string|null} kingdomId
+   */
+  kingdomId: {
+    type: String,
+    default: null,
+  },
+
+  /**
+   * The rank of the user's user.
+   *
+   * @property {string} rank
+   */
+  rank: {
+    type: Number,
+  },
+
+  /**
+   * A quote associated with the user.
+   *
+   * @property {string} quote
+   */
+  quote: {
+    type: String,
+  },
+
+  /**
+   * The amount of in-game diamonds held by the user.
+   *
+   * @property {number} diamondAmount
+   */
+  diamondAmount: {
+    type: Number,
+  },
+
+  /**
+   * The amount of in-game gold held by the user.
+   *
+   * @property {number} goldAmount
+   */
+  goldAmount: {
+    type: Number,
+  },
+
+  /**
+   * An array of equipment IDs associated with the user.
+   *
+   * @property {Equipment[]} equipments
+   */
+  equipments: [
+    {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Deck',
+      ref: 'Equipment',
     },
-  
-    /**
-     * The kingdom ID associated with the user (nullable).
-     *
-     * @property {string|null} kingdomId
-     */
-    kingdomId: {
-      type: String,
-      default: null,
-    },
-  
-    /**
-     * The rank of the user's user.
-     *
-     * @property {string} rank
-     */
-    rank: {
-      type: Number,
-    },
-  
-    /**
-     * A quote associated with the user.
-     *
-     * @property {string} quote
-     */
-    quote: {
-      type: String,
-    },
-  
-    /**
-     * The amount of in-game diamonds held by the user.
-     *
-     * @property {number} diamondAmount
-     */
-    diamondAmount: {
-      type: Number,
-    },
-  
-    /**
-     * The amount of in-game gold held by the user.
-     *
-     * @property {number} goldAmount
-     */
-    goldAmount: {
-      type: Number,
-    },
-  
-    /**
-     * An array of equipment IDs associated with the user.
-     *
-     * @property {Equipment[]} equipments
-     */
-    equipments: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Equipment',
-      },
-    ],
+  ],
 });
 
 /**

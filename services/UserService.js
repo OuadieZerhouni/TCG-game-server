@@ -41,7 +41,7 @@ class UserService {
    */
   static async findUserById(userId) {
     try {
-      const user = await User.findById(userId).exec();
+      const user = await User.findById(userId).populate('deck').populate({path:'deck',populate:{path:'cards'}}).exec();
       return user;
     } catch (error) {
       throw new Error('Unable to find user by ID');

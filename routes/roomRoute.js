@@ -19,20 +19,18 @@ const DeckService = require('../services/deckService');
 router.post('/', async (req, res) => {
     try {
         const token = req.header('authorization').split(' ')[1];
-        console.log(token);
         if(!token) return res.status(401).send('Access denied. No token provided.');
         const userId = decodeToken(token);
         const player1 = await UserService.findUserById(userId);
         const battleType = req.body.battleType;
         if (battleType === 'offline') {
-            console.log(req.body);
-            const level = levelService.findLevelByStringId(req.body.level);
-            const deck1 = DeckService.findDeckById(player1.deck);
-            const deck2 = DeckService.findDeckById(level.deck);
+            const level = await levelService.findLevelByStringId(req.body.level);
+            const deck1 = player1.deck;
+            const deck2 = level.deck;
             const roomId = uuidv4();
-            console.log(roomId);
+            console.log('=> roomId : ' + roomId);
             const room = new Room(roomId, player1.id, null, 1, 0, new Date(), deck1, deck2, 2000, 2000);
-            res.status(201).json({ roomId: roomId });
+            res.status(201).json({ roomId: roomId , port : process.env.SOCKET_PORT});
         }
         // else if(battleType === 'online') {
         //     const player2 = UserService.findUserById(req.body.player2Id);
