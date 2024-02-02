@@ -2,6 +2,7 @@
    Creation Date: 2024-01-28 01:22:07 */
 
 const http = require('http');
+const Room = require('./classes/RoomClass');
 const server = http.createServer();
 const io = require('socket.io')(server);
 
@@ -13,23 +14,12 @@ const rooms = {};
 io.on('connection', (socket) => {
    console.log(`User connected: ${socket.id}`);
 
-   // Create a new room
-   socket.on('createRoom', (roomId) => {
-      // Check if the room already exists
-      if (rooms[roomId]) {
-         socket.emit('roomExists', roomId);
-      } else {
-         // Create a new room
-         rooms[roomId] = { players: {} };
-         socket.join(roomId);
-         socket.emit('roomCreated', roomId);
-      }
-   });
-
    // Join a room
-   socket.on('joinRoom', (roomId, playerId) => {
-      console.log(`Player ${playerId} joined room ${roomId}`);
-      const room = rooms[roomId];
+   socket.on('joinRoom', (roomId) => {
+      const room = Room.findRoomById(roomId);
+      console.log(`RoomID : ${roomId}`);
+      console.log(`Player ${room.player1_id} joined room ${roomId}`);
+      
       if (room) {
          // Add the player to the room
          room.players[socket.id] = playerId;

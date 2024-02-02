@@ -6,7 +6,19 @@
 
 class Room {
     static rooms = [];
-
+    /**
+     * 
+     * @param {String} Id 
+     * @param {String} player1_id 
+     * @param {String} player2_id 
+     * @param {Number} turn 
+     * @param {Number} duration 
+     * @param {Date} startDate 
+     * @param {String} deck1 
+     * @param {String} deck2 
+     * @param {Number} blood1 
+     * @param {Number} blood2 
+     */
     constructor(Id, player1_id, player2_id, turn, duration, startDate, deck1, deck2, blood1, blood2) {
         this.Id = Id;
         this.player1_id = player1_id;
@@ -25,6 +37,11 @@ class Room {
         Room.rooms.push(this);
     }
 
+    /**
+     * 
+     * @param {String} Id 
+     * @returns {Room} the room with the given Id
+     */
     static findRoomById(Id) {
         return Room.rooms.find(room => room.Id === Id);
     }
