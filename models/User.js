@@ -150,6 +150,18 @@ const userSchema = new mongoose.Schema({
       ref: 'Equipment',
     },
   ],
+
+
+  /**
+   * An array of user card IDs associated with the user.
+   * @property {UserCard[]} userCards
+   */
+  userCards: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'UserCard',
+    },
+  ],
 });
 
 /**

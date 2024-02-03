@@ -33,6 +33,22 @@ class CardController {
   }
 
   /**
+   * getAllCardsNames
+   * @param {express.Request} req - The request object.
+   * @param {express.Response} res - The response object.
+   * @returns {Promise<void>} resolve with a list of all cards names
+   */
+  static async getAllCardsNames(req, res) {
+    try {
+      const cards = await CardService.getAllCardsNames();
+      res.status(200).json({ cardsNames: cards.map(card => card.name) });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Internal Server Error');
+    }
+  }
+
+  /**
    * Get a card by ID.
    *
    * @param {express.Request} req - The request object.

@@ -38,6 +38,22 @@ const upload = multer({
  */
 router.get('/', CardController.getAllCards);
 
+
+/**
+ * @swagger
+ * /:
+ *   get:
+ *     summary: Get a list of all cards names
+ *     tags: [Cards]
+ *     responses:
+ *       200:
+ *         description: A list of card objects.
+ *       500:
+ *         description: Internal server error.
+ */
+router.get('/names', CardController.getAllCardsNames);
+
+
 /**
  * @swagger
  * /{cardId}:

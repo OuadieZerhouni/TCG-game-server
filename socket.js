@@ -19,12 +19,32 @@ io.on('connection', (socket) => {
       const room = Room.findRoomById(roomId);
       console.log(`RoomID : ${roomId}`);
       console.log(`Player ${room.player1_id} joined room ${roomId}`);
-      
+
       if (room) {
          // Add the player to the room
          room.players[socket.id] = playerId;
          socket.join(roomId);
-         io.to(roomId).emit('playerJoined', playerId);
+         InitialData = { deck1: [], deck2: [] };
+         room.deck1.forEach(card => {
+            cardData = {
+               name: card.name,
+               attack: card.attack,
+               blood: card.blood,
+               abilities: card.abilities,
+            };
+            InitialData.deck1.push(card);
+         });
+         room.deck2.forEach(card => {
+            cardData = {
+               name: card.name,
+               attack: card.attack,
+               blood: card.blood,
+               abilities: card.abilities,
+            };
+            InitialData.deck2.push(card);
+         });
+         socket.emit('initialData', InitialData);
+         io.to(roomId).broadcast.emit('initialData',  InitialData);
       } else {
          socket.emit('roomNotFound', roomId);
       }

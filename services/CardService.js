@@ -26,6 +26,8 @@ class CardService {
     }
   }
 
+
+
   /**
    * Find a card by its ID.
    *
@@ -38,6 +40,19 @@ class CardService {
       return card;
     } catch (error) {
       throw new Error('Unable to find card by ID');
+    }
+  }
+
+  /**
+   * getAllCardsNames
+   * @returns {Promise<Card[]>} - The list of cards names.
+   */
+  static async getAllCardsNames() {
+    try {
+      const cards = await Card.find().select('name').exec();
+      return cards;
+    } catch (error) {
+      throw new Error('Unable to get all cards names');
     }
   }
 
