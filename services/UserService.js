@@ -3,7 +3,7 @@
 
 /* Author: Ouadie ZERHOUNI
    Creation Date: 2024-01-28 01:21:48 */
-
+const CardModel = require('../models/card');
 const User = require('../models/user'); // Adjust the path as needed
 const bcrypt = require('bcrypt');
 
@@ -24,7 +24,7 @@ class UserService {
       const createdUser = await newUser.save();
       return createdUser;
     } catch (error) {
-      throw   new Error('Unable to create user :'+error);
+      throw new Error('Unable to create user :' + error);
     }
   }
 
@@ -41,7 +41,18 @@ class UserService {
    */
   static async findUserById(userId) {
     try {
-      const user = await User.findById(userId).populate('deck').populate({path:'deck',populate:{path:'cards'}}).exec();
+      const user = await User.findById(userId)
+  .populate({
+    path: 'deck',
+    populate: {
+      path: 'cards',
+      populate: {
+        path: 'cardId',
+        model: 'Card', // Specify the model name for 'Card'
+      },
+    },
+  })
+  .exec();
       return user;
     } catch (error) {
       throw new Error('Unable to find user by ID');
@@ -93,7 +104,7 @@ class UserService {
       }
       return user;
     } catch (error) {
-      throw new Error('Unable to login user :'+error);
+      throw new Error('Unable to login user :' + error);
     }
   }
 

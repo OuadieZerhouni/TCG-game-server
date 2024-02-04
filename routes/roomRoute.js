@@ -28,8 +28,7 @@ router.post('/', async (req, res) => {
             const deck1 = player1.deck;
             const deck2 = level.deck;
             const roomId = uuidv4();
-            console.log('=> roomId : ' + roomId);
-            const room = new Room(roomId, player1.id, null, 1, 0, new Date(), deck1, deck2, 2000, 2000);
+            const room = new Room(roomId, player1.id, level._id, 1, 0, new Date(), deck1, deck2, 2000, 2000);
             res.status(201).json({ roomId: roomId , port : process.env.SOCKET_PORT});
         }
         // else if(battleType === 'online') {

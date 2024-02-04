@@ -5,6 +5,8 @@ const http = require('http');
 const Room = require('./classes/RoomClass');
 const server = http.createServer();
 const io = require('socket.io')(server);
+const User = require('./models/user');
+const Level = require('./models/level');
 
 const PORT = process.env.SOCKET_PORT || 5050;
 
@@ -15,36 +17,62 @@ io.on('connection', (socket) => {
    console.log(`User connected: ${socket.id}`);
 
    // Join a room
-   socket.on('joinRoom', (roomId) => {
+   socket.on('joinRoom', async (roomId) => {
       const room = Room.findRoomById(roomId);
       console.log(`RoomID : ${roomId}`);
       console.log(`Player ${room.player1_id} joined room ${roomId}`);
 
       if (room) {
          // Add the player to the room
-         room.players[socket.id] = playerId;
          socket.join(roomId);
          InitialData = { deck1: [], deck2: [] };
-         room.deck1.forEach(card => {
+         // populate cards.cardid with the card data
+         room.deck2?.populate('cards.cardId');
+
+
+
+         // console.log(room.deck2);
+         console.log(await Level.find(room.player2_id)
+         .populate({
+           path: 'deck',
+           populate: {
+             path: 'cards',
+             populate: {
+               path: 'cardId',
+               model: 'Card'
+             }
+           }
+         })
+         .exec()
+         .then(populatedUser => {
+           console.log('====' + populatedUser[0].deck.cards[0]);
+         })
+         .catch(err => {
+           console.error(err);
+         }));
+
+
+
+         room.deck1?.cards.forEach(card => {
             cardData = {
-               name: card.name,
+               name: card.cardId.name,
                attack: card.attack,
                blood: card.blood,
                abilities: card.abilities,
             };
-            InitialData.deck1.push(card);
+            InitialData.deck1.push(cardData);
          });
-         room.deck2.forEach(card => {
+         room.deck2?.cards.forEach(card => {
             cardData = {
-               name: card.name,
+               name: card.cardId.name,
                attack: card.attack,
                blood: card.blood,
-               abilities: card.abilities,
+               abilities: card.unlockedAbilities,
             };
-            InitialData.deck2.push(card);
+            InitialData.deck2.push(cardData);
          });
          socket.emit('initialData', InitialData);
-         io.to(roomId).broadcast.emit('initialData',  InitialData);
+         // io.to(roomId).broadcast.emit('initialData',  InitialData);
       } else {
          socket.emit('roomNotFound', roomId);
       }

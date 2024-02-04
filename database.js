@@ -6,7 +6,6 @@
 
 const mongoose = require('mongoose');
 require('dotenv').config();
-
 // Define the MongoDB URI. Replace 'your_database_url' with your actual MongoDB URL.
 const MONGO_URI = 'mongodb://127.0.0.1:27017/GameDB';
 

@@ -5,6 +5,7 @@
    Creation Date: 2024-01-28 01:21:47 */
 
 const mongoose = require('mongoose');
+const { populate } = require('./level');
 
 /**
  * Represents a card owned by a user in the game.
@@ -15,7 +16,7 @@ const userCardSchema = new mongoose.Schema({
   /**
    * The ID of the card associated with this user card.
    *
-   * @property {string} cardId
+   * @property {Card} cardId
    * @required
    */
   cardId: {

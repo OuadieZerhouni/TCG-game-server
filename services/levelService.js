@@ -78,7 +78,11 @@ const findLevelByStringId = async (levelInfo) => {
             path: 'deck',
             populate: {
                 path: 'cards',
-                model: 'UserCard'
+                model: 'UserCard',
+                populate : {
+                    path: 'cardId',
+                    model: 'Card'
+                }
             }
         });
         return level;
