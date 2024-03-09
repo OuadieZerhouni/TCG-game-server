@@ -18,10 +18,8 @@ io.on('connection', (socket) => {
 
    // Join a room
    socket.on('joinRoom', async (roomId) => {
+      console.log(`User ${socket.id} joining room ${roomId}`);
       const room = Room.findRoomById(roomId);
-      console.log(`RoomID : ${roomId}`);
-      console.log(`Player ${room.player1_id} joined room ${roomId}`);
-
       if (room) {
          // Add the player to the room
          socket.join(roomId);
@@ -29,31 +27,7 @@ io.on('connection', (socket) => {
          // populate cards.cardid with the card data
          room.deck2?.populate('cards.cardId');
 
-
-
-         // console.log(room.deck2);
-         console.log(await Level.find(room.player2_id)
-         .populate({
-           path: 'deck',
-           populate: {
-             path: 'cards',
-             populate: {
-               path: 'cardId',
-               model: 'Card'
-             }
-           }
-         })
-         .exec()
-         .then(populatedUser => {
-           console.log('====' + populatedUser[0].deck.cards[0]);
-         })
-         .catch(err => {
-           console.error(err);
-         }));
-
-
-
-         room.deck1?.cards.forEach(card => {
+         room.deck2?.cards.forEach(card => {
             cardData = {
                name: card.cardId.name,
                attack: card.attack,
@@ -71,13 +45,13 @@ io.on('connection', (socket) => {
             };
             InitialData.deck2.push(cardData);
          });
+         console.log('sending initial data to room: ', InitialData);
          socket.emit('initialData', InitialData);
          // io.to(roomId).broadcast.emit('initialData',  InitialData);
       } else {
          socket.emit('roomNotFound', roomId);
       }
    });
-
    // Handle game events and broadcast to the room
    socket.on('gameEvent', (roomId, eventData) => {
       io.to(roomId).emit('gameEvent', eventData);

@@ -1,8 +1,7 @@
 /* Author: Ouadie ZERHOUNI
    Creation Date: 2024-01-28 01:22:08 */
 
-/* Author: Ouadie ZERHOUNI
-   Creation Date: 2024-01-28 01:21:47 */
+
 
 const Deck = require('../models/deck'); // Adjust the path as needed
 
