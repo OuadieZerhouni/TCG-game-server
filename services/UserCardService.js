@@ -10,6 +10,21 @@ const UserCard = require('../models/userCard'); // Adjust the path as needed
  * Service class for managing user cards in the game.
  */
 class UserCardService {
+
+  /**
+   * getAllUserCards
+   * 
+   * @returns {Promise<UserCard[]>} - A list of all user cards.
+   */
+  static async getAllUserCards() {
+    try {
+      const userCards = await UserCard.find().exec();
+      return userCards;
+    } catch (error) {
+      throw new Error('Unable to get all user cards');
+    }
+  }
+
   /**
    * Create a new user card.
    *
@@ -38,6 +53,30 @@ class UserCardService {
       return userCard;
     } catch (error) {
       throw new Error('Unable to find user card by ID');
+    }
+  }
+
+  
+  static async createNewUserCardFromCard(cardData) {
+    try {
+      const newCard = new UserCard({cardId: cardData._id, attack: cardData.baseAttack, blood: cardData.baseBlood, xp: 0, level: 1});
+      const createdCard = await newCard.save();
+      return await UserCard.findById(createdCard._id).populate('cardId').exec();
+    } catch (error) {
+      throw new Error('Unable to create card : ' + error);
+    }
+  }
+
+  /**
+   * 
+   * @returns {Promise<UserCard[]>} - A list of all user cards.
+   */
+  static async getOneRandomUserCard() {
+    try {
+      const userCard = await UserCard.aggregate([{ $sample: { size: 1 } }]);
+      return userCard;
+    } catch (error) {
+      throw new Error('Unable to get random user card');
     }
   }
 

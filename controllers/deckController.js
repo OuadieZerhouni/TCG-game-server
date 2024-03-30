@@ -81,7 +81,6 @@ static async updateDeck(req, res) {
   try {
     const deckId = req.params.deckId;
     const { cardsToAdd, cardsToRemove } = req.body;
-    console.log(req.body);
     // Find the deck by ID
     const deck = await deckService.findDeckById(deckId);
     if (!deck) {
@@ -100,7 +99,6 @@ static async updateDeck(req, res) {
           blood             : card.baseBlood,
           unlockedAbilities : [],
         });
-        console.log(userCard);
         userCardIdsToAdd.push(userCard._id);
       }
     }

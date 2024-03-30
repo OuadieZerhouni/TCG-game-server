@@ -7,6 +7,7 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const CardController = require('../controllers/cardController.js');
+const {checkJwt} = require('../middlewares/authMiddleware');
 
 // Configure multer for file handling
 const upload = multer({
@@ -16,6 +17,21 @@ const upload = multer({
     },
 });
 
+/**
+ * @swagger
+ * /:
+ *   get:
+ *     summary: Get a list of all cards names
+ *     tags: [Cards]
+ *     responses:
+ *       200:
+ *         description: A list of card objects.
+ *       500:
+ *         description: Internal server error.
+ */
+router.get('/names', CardController.getAllCardsNames);
+
+router.use(checkJwt);
 /**
  * @swagger
  * tags:
@@ -36,21 +52,6 @@ const upload = multer({
  *         description: Internal server error.
  */
 router.get('/', CardController.getAllCards);
-
-
-/**
- * @swagger
- * /:
- *   get:
- *     summary: Get a list of all cards names
- *     tags: [Cards]
- *     responses:
- *       200:
- *         description: A list of card objects.
- *       500:
- *         description: Internal server error.
- */
-router.get('/names', CardController.getAllCardsNames);
 
 
 /**

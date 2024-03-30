@@ -28,6 +28,20 @@ class CardService {
 
 
   /**
+   * getOneRandomUserCard
+   * 
+   * @returns {Promise<Card>} - A random user card.
+   */
+  static async getOneRandomCard() {
+    try {
+      const userCard = await Card.aggregate([{ $sample: { size: 1 } }]);
+      return userCard[0];
+    } catch (error) {
+      throw new Error('Unable to get a random user card: ' + error);
+    }
+  }
+
+  /**
    * Find a card by its ID.
    *
    * @param {string} cardId - The ID of the card to find.

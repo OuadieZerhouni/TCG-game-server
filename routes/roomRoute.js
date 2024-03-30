@@ -1,12 +1,9 @@
 /* Author: Ouadie ZERHOUNI
    Creation Date: 2024-01-28 01:22:07 */
-
-
-
 const express = require('express');
 const router = express.Router();
 const levelService = require('../services/levelService');
-const Room = require('../classes/RoomClass');
+const Room = require('../classes/Room');
 const { decodeToken } = require('../services/jwtServices');
 const UserService = require('../services/userService');
 const { v4: uuidv4 } = require('uuid');

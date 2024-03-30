@@ -3,6 +3,7 @@
 
 
 
+const DeckService = require('../services/deckService');
 const UserService = require('../services/userService');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
@@ -69,7 +70,6 @@ class UserController {
           { expiresIn: 360000 },
           (err, token) => {
             if (err) throw err;
-            console.log('------userData',token);
             res.status(200).json({ token , user: userData});
           }
         );
@@ -110,19 +110,21 @@ class UserController {
    */
   static async createUser(req, res) {
     try {
-      let userData       = req.body;
-      initUserData= {
-      rank: -1,
-      quote: '',
-      diamondAmount: 100,
-      goldAmount: 10000,
-      equipments: []}
-      userData = {...userData, ...initUserData}
+      let userData  = req.body;
+      const newDeck = await DeckService.createDeck();
+      console.log(newDeck);
+      const initUserData  = {
+        rank         : -1,
+        quote        : '',
+        deck         : newDeck._id,
+        diamondAmount: 100,
+        goldAmount   : 10000,
+        equipments   : []
+      }
+      userData             = { ...userData, ...initUserData }
       const createdUser    = await UserService.createUser(userData);
-
       createdUser.password = undefined;
-
-      const playload = {
+      const playload       = {
         user: {
           id: createdUser.id,
         },

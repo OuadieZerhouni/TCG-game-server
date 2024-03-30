@@ -3,7 +3,10 @@
 
 
 
+const CardService = require('../services/cardService');
+const DeckService = require('../services/deckService');
 const UserCardService = require('../services/userCardService');
+const UserService = require('../services/userService');
 
 /**
  * Controller for managing user card operations.
@@ -24,6 +27,23 @@ class UserCardController {
       console.error(error);
       res.status(500).send('Internal Server Error');
     }
+  }
+
+  /**
+   * Get a random user card from the database.
+   * @param {express.Request} req - The request object.
+   * @param {express.Response} res - The response object.
+   * @returns {Promise<void>}
+   */
+  static async getOneRandomUserCard(req, res) {
+
+    const user = await UserService.findUserById(req.user._id);
+    // get a random user card from the database
+    const card = await CardService.getOneRandomCard();
+    const userCard = await UserCardService.createNewUserCardFromCard(card);
+    DeckService.addUserCardToDeck(user.deck, userCard);
+    // console.log(userCard);
+    res.status(200).json(userCard);
   }
 
   /**

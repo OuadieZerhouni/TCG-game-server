@@ -64,7 +64,6 @@ static async createAbility(req, res) {
   try {
     // Access the fields sent in the request
     const { functionName, power } = req.body;
-    console.log(req.body);
     // Create an ability object with power and functionName
     const ability = {
         power,

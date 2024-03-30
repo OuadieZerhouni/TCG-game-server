@@ -26,7 +26,7 @@ const UserCardController = require('../controllers/userCardController.js');
  *       500:
  *         description: Internal server error.
  */
-router.get('/api/user-cards', UserCardController.getAllUserCards);
+router.get('/', UserCardController.getAllUserCards);
 
 /**
  * @swagger
@@ -49,7 +49,21 @@ router.get('/api/user-cards', UserCardController.getAllUserCards);
  *       500:
  *         description: Internal server error.
  */
-router.get('/api/user-cards/:userCardId', UserCardController.getUserCardById);
+router.get('/:userCardId', UserCardController.getUserCardById);
+
+/**
+ * @swagger
+ * /api/user-cards/randomOne:
+ *  post:
+ *   summary: Get a random user card.
+ *  tags: [UserCards]
+ * responses:
+ * 200:
+ * description: A user card object.
+ * 500:
+ * description: Internal server error.
+ */
+router.post('/randomOne', UserCardController.getOneRandomUserCard);
 
 /**
  * @swagger
@@ -71,7 +85,7 @@ router.get('/api/user-cards/:userCardId', UserCardController.getUserCardById);
  *       500:
  *         description: Internal server error.
  */
-router.post('/api/user-cards', UserCardController.createUserCard);
+router.post('/', UserCardController.createUserCard);
 
 /**
  * @swagger
@@ -102,7 +116,7 @@ router.post('/api/user-cards', UserCardController.createUserCard);
  *       500:
  *         description: Internal server error.
  */
-router.put('/api/user-cards/:userCardId', UserCardController.updateUserCard);
+router.put('/:userCardId', UserCardController.updateUserCard);
 
 /**
  * @swagger
@@ -125,6 +139,5 @@ router.put('/api/user-cards/:userCardId', UserCardController.updateUserCard);
  *       500:
  *         description: Internal server error.
  */
-router.delete('/api/user-cards/:userCardId', UserCardController.deleteUserCard);
-
+router.delete('/:userCardId', UserCardController.deleteUserCard);
 module.exports = router;

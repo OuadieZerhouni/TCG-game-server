@@ -18,6 +18,86 @@ const { checkJwt } = require('../middlewares/authMiddleware.js');
 /**
  * @swagger
  * /api/users:
+ *   post:
+ *     summary: Create a new user.
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/User'
+ *     responses:
+ *       201:
+ *         description: The created user.
+ *       400:
+ *         description: Invalid request data.
+ *       500:
+ *         description: Internal server error.
+ */
+router.post('/', UserController.createUser);
+
+/**
+ * @swagger
+ * /api/users/check:
+ *   get:
+ *     summary: Check if a user exists by email and username.
+ *     tags: [Users]
+ *     parameters:
+ *       - in: query
+ *         name: email
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Email of the user to check.
+ *       - in: query
+ *         name: username
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Username of the user to check.
+ *     responses:
+ *       200:
+ *         description: User exists.
+ *       404:
+ *         description: User not found.
+ *       500:
+ *         description: Internal server error.
+ */
+router.post('/check', UserController.checkUserExist);
+
+/**
+ * @swagger
+ * /api/users/login:
+ *   post:
+ *     summary: User Login
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Successful login. Returns a token.
+ *       400:
+ *         description: Invalid credentials provided.
+ *       500:
+ *         description: Internal server error.
+ */
+router.post('/login', UserController.loginUser);
+
+router.use(checkJwt);
+
+/**
+ * @swagger
+ * /api/users:
  *   get:
  *     summary: Get a list of all users.
  *     tags: [Users]
@@ -52,83 +132,6 @@ router.get('/', UserController.getAllUsers);
  */
 router.get('/:userId', UserController.getUserById);
 
-/**
- * @swagger
- * /api/users/login:
- *   post:
- *     summary: User Login
- *     tags: [Users]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               username:
- *                 type: string
- *               password:
- *                 type: string
- *     responses:
- *       200:
- *         description: Successful login. Returns a token.
- *       400:
- *         description: Invalid credentials provided.
- *       500:
- *         description: Internal server error.
- */
-router.post('/login', UserController.loginUser);
-
-/**
- * @swagger
- * /api/users/check:
- *   get:
- *     summary: Check if a user exists by email and username.
- *     tags: [Users]
- *     parameters:
- *       - in: query
- *         name: email
- *         schema:
- *           type: string
- *         required: true
- *         description: Email of the user to check.
- *       - in: query
- *         name: username
- *         schema:
- *           type: string
- *         required: true
- *         description: Username of the user to check.
- *     responses:
- *       200:
- *         description: User exists.
- *       404:
- *         description: User not found.
- *       500:
- *         description: Internal server error.
- */
-router.post('/check', UserController.checkUserExist);
-
-/**
- * @swagger
- * /api/users:
- *   post:
- *     summary: Create a new user.
- *     tags: [Users]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/User'
- *     responses:
- *       201:
- *         description: The created user.
- *       400:
- *         description: Invalid request data.
- *       500:
- *         description: Internal server error.
- */
-router.post('/', UserController.createUser);
 
 /**
  * @swagger

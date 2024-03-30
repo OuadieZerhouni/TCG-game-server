@@ -80,7 +80,6 @@ class CardController {
     try {
       const cardData = req.body;
       const createdCard = await CardService.createCard(cardData);
-      console.log(req.file);
       // Save the image data as a PNG file with the function name as the filename
       if (req.file) {
         // Remove the data URI prefix and decode the base64 string
