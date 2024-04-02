@@ -1,8 +1,6 @@
 /* Author: Ouadie ZERHOUNI
    Creation Date: 2024-01-28 01:22:07 */
 
-
-
 const mongoose = require('mongoose');
 
 /**

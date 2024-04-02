@@ -17,7 +17,7 @@ router.post('/', async (req, res) => {
             const token      = req.header('authorization').split(' ')[1];
             if(!token) return res.status(401).send('Access denied. No token provided.');
             const userId     = decodeToken(token);
-            const player1    = await UserService.findUserById(userId);
+            const player1    = await UserService.findUserById(userId, true);
             const battleType = req.body.battleType;
         if (battleType === 'offline') {
             const level  = await levelService.findLevelByStringId(req.body.level);

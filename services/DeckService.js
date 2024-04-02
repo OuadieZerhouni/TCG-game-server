@@ -11,26 +11,6 @@ const UserCard = require('../models/userCard');
  */
 class DeckService {
 
-
-
-  /**
-   * addUserCardToDeck
-   * 
-   * @param {Deck} deck - The ID of the deck to add the user card to.
-   * @param {UserCard} userCard - The ID of the user card to add to the deck.
-   */
-  static async addUserCardToDeck(deck, userCard) {
-    try {
-      deck.cards.push(userCard._id);
-      let cardPower = userCard.attack + userCard.blood;
-      deck.totalPower += cardPower;
-      await deck.save();
-      return deck;
-    } catch (error) {
-      throw new Error('Unable to add user card to deck: ' + error.message); // Include the actual error message
-    }
-  } 
-
   /**
    * Create a new deck.
    *

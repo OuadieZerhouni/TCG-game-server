@@ -82,6 +82,7 @@ const userSchema = new mongoose.Schema({
   avatar: {
     type: String,
   },
+
   /**
    * The deck associated with the user.
    *

@@ -107,7 +107,7 @@ router.use(checkJwt);
  *       500:
  *         description: Internal server error.
  */
-router.get('/', UserController.getAllUsers);
+// router.get('/', UserController.getAllUsers);
 
 /**
  * @swagger
@@ -132,6 +132,8 @@ router.get('/', UserController.getAllUsers);
  */
 router.get('/:userId', UserController.getUserById);
 
+
+router.get('/current/user', UserController.getCurrentUser);
 
 /**
  * @swagger

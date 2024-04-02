@@ -41,8 +41,7 @@ class UserCardController {
     // get a random user card from the database
     const card = await CardService.getOneRandomCard();
     const userCard = await UserCardService.createNewUserCardFromCard(card);
-    DeckService.addUserCardToDeck(user.deck, userCard);
-    // console.log(userCard);
+    UserService.addUserCard(user, userCard);
     res.status(200).json(userCard);
   }
 

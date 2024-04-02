@@ -79,6 +79,26 @@ class UserController {
       res.status(500).send('Internal Server Error');
     }
   }
+
+  /**
+   * Get the current user.
+   *
+   * @param {express.Request} req - The request object.
+   * @param {express.Response} res - The response object.
+   * @returns {Promise<void>}
+   */
+  static async getCurrentUser(req, res) {
+    const userId = req.user._id;
+    const user = await UserService.findUserById(userId, true);
+    if (!user) {
+      res.status(404).send('User not found');
+    } else {
+      user.password = undefined;
+      console.log(user);
+      res.status(200).json(user);
+    }
+  }
+
   /**
    * Get a user by ID.
    *
@@ -119,7 +139,8 @@ class UserController {
         deck         : newDeck._id,
         diamondAmount: 100,
         goldAmount   : 10000,
-        equipments   : []
+        equipments   : [],
+        userCards        : [],
       }
       userData             = { ...userData, ...initUserData }
       const createdUser    = await UserService.createUser(userData);
