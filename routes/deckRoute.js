@@ -72,7 +72,8 @@ router.get('/:deckId', DeckController.getDeckById);
  *         description: Internal server error.
  */
 router.post('/', DeckController.createDeck);
-
+// /updateUserDeckCards
+router.post('/updateUserDeckCards', DeckController.updateUserDeckCards);
 /**
  * @swagger
  * //{deckId}:

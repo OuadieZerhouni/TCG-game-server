@@ -3,7 +3,7 @@
 
 
 
-const Deck = require('../models/deck'); // Adjust the path as needed
+const Deck = require('../models/deck');
 const UserCard = require('../models/userCard');
 
 /**
@@ -11,6 +11,72 @@ const UserCard = require('../models/userCard');
  */
 class DeckService {
 
+  // deckService.updateDeckCards(user.deck._id, cardsToAdd, cardsToRemove)
+  static async updateDeckCards(deckId, cardsToAdd, cardsToRemove) {
+    try {
+      console.log(cardsToAdd);
+      console.log(cardsToRemove);
+      const deck = await Deck.findById(deckId).exec();
+      for (const card of cardsToAdd) {
+        const userCard = await UserCard
+          .findById(card)
+          .exec();
+        deck.totalPower += userCard.attack + userCard.blood;
+        deck.cards.push(userCard._id);
+      }
+      for (const card of cardsToRemove) {
+        const userCard = await UserCard
+          .findById(card)
+          .exec();
+        deck.totalPower -= userCard.attack + userCard.blood;
+        deck.cards = deck.cards.filter(cardId => cardId.toString() !== card);
+      }
+      await deck.save();
+    }
+    catch (error) {
+      throw new Error('Unable to update deck cards: ' + error.message); // Include the actual error message
+    }
+  }
+
+
+  
+  /**
+   * Adds a card to a deck.
+   * @param {string} deckId - The ID of the deck.
+   * @param {string} userCardId - The card to be added to the deck.
+   * @throws {Error} If unable to add card to deck.
+   */
+  static async addCardToDeck(deckId, userCardId) {
+    try {
+      const deck = await Deck.findById(deckId).exec();
+      const userCard = await UserCard.findById(userCardId).exec();
+      deck.totalPower += userCard.attack + userCard.blood;
+      console.log( userCard.attack);
+      deck.cards.push(userCard._id);
+      await deck.save();
+    } catch (error) {
+      throw new Error('Unable to add card to deck: ' + error.message); // Include the actual error message
+    }
+  }
+
+  /**
+   * remove a card from a deck.
+   * 
+   * @param {string} deckId - The ID of the deck.
+   * @param {string} userCardId - The card to be removed from the deck.
+   * @throws {Error} If unable to remove card from deck.
+   */
+  static async removeCardFromDeck(deckId, userCardId) {
+    try {
+      const deck = await Deck.findById(deckId).exec();
+      const userCard = await UserCard.findById(userCardId).exec();
+      deck.totalPower -= userCard.attack + userCard.blood;
+      deck.cards = deck.cards.filter(card => card.toString() !== userCardId);
+      await deck.save();
+    } catch (error) {
+      throw new Error('Unable to remove card from deck: ' + error.message); // Include the actual error message
+    }
+  }
   /**
    * Create a new deck.
    *

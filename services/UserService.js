@@ -37,7 +37,6 @@ class UserService {
   static async createUser(userData) {
     try {
       userData.password = await UserService.hashPassword(userData.password);
-      console.log(userData);
       const newUser = new User(userData);
       const createdUser = await newUser.save();
       return createdUser;
@@ -61,7 +60,6 @@ class UserService {
    */
   static async findUserById(userId, populate = false) {
     try {
-      console.log(userId);
       let query = User.findById(userId);
       if (populate) {
         query = query.populate({

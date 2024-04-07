@@ -4,13 +4,53 @@
 
 
 const deckService = require('../services/deckService');
-const cardSevice = require('../services/cardService');
+const cardService = require('../services/cardService');
 const userCardService = require('../services/userCardService');
+const userService = require('../services/userService');
 
 /**
  * Controller for managing deck operations.
  */
 class DeckController {
+
+
+  // updateUserDeckCards
+  static async updateUserDeckCards(req, res) {
+    try {
+      const user = await userService.findUserById(req.user._id, true);
+      const receivedDeckCards = req.body.cardIds;
+      console.log(receivedDeckCards);
+      // receivedDeckCards.forEach((card) => {
+      //   console.log(user.userCards.map(card => card._id.toString()));
+      //   if (user.userCards.map(card => card._id.toString()).includes(card)
+      //   && !user.deck.cards.includes(card)) {
+      //     deckService.addCardToDeck(user.deck._id, card);
+      //   }
+      // });
+      // loop throuf deck.cards every id exist in recievedCards remove it from recieved cardas array , if the id exist in deck.cards and not in recievedCards remove it from deck.cards
+      const deck = await deckService.findDeckById(user.deck._id);
+      const deckCards = deck.cards.map(card => card.toString());
+      const cardsToAdd = [];
+      const cardsToRemove = [];
+      for (const card of receivedDeckCards) {
+        if (deckCards.includes(card)) {
+          deckCards.splice(deckCards.indexOf(card), 1);
+        } else {
+          if (user.userCards.map(card => card._id.toString()).includes(card)) {
+            cardsToAdd.push(card);
+          }
+        }
+      }
+      cardsToRemove.push(...deckCards);
+      console.log(cardsToAdd);
+      console.log(cardsToRemove);
+      deckService.updateDeckCards(user.deck._id, cardsToAdd, cardsToRemove);
+    }
+    catch (error) {
+      console.error(error);
+      res.status(500).send('Internal Server Error');
+    }
+  }
   /**
    * Get a list of all decks.
    *
@@ -91,7 +131,7 @@ static async updateDeck(req, res) {
     // Create UserCard objects for cards to add and get their IDs
     const userCardIdsToAdd = [];
     for (const cardId of cardsToAdd) {
-      const card = await cardSevice.findCardById(cardId);
+      const card = await cardService.findCardById(cardId);
       if (card) {
         const userCard = await userCardService.createUserCard({
           cardId            : cardId,
