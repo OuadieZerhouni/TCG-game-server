@@ -12,4 +12,4 @@ steps:
   - name: display-test-log
     image: alpine
     commands:
-      - echo "Test log\: The pipeline is running successfully."
+      - echo "Test log The pipeline is running successfully."
