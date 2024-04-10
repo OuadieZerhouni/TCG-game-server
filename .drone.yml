@@ -18,6 +18,7 @@ steps:
         from_secret: private
       port: 22
       script:
-        - echo "Deploying to production server"
         - cd /home/ouadie/Game-backend
         - git pull
+    commands:
+      - echo "done"
