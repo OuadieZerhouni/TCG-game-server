@@ -1,13 +1,11 @@
 kind: pipeline
 type: docker
 name: default
-
 trigger:
   branch:
     - main
   event:
     - push
-
 steps:
   - name: update-production
     image: appleboy/drone-ssh
@@ -15,10 +13,10 @@ steps:
       host: 188.166.85.184
       username: root
       key:
-        from_secret: private
-      port: 22
+        from_secret: server_ssh_key
+        from_secret: private_key
+       port: 22
       script:
         - cd /home/ouadie/Game-backend
         - git pull
-    commands:
-      - echo "done"
+        - # Add any other commands needed for your deployment, like restarting services
