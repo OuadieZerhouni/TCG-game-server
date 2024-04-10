@@ -15,7 +15,7 @@ steps:
       key:
         from_secret: server_ssh_key
         from_secret: private_key
-       port: 22
+      port: 22
       script:
         - cd /home/ouadie/Game-backend
         - git pull
