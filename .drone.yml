@@ -15,7 +15,7 @@ steps:
       host: 188.166.85.184
       username: root
       key:
-        from_secret: server_ssh_key
+        from_secret: private_key
        port: 22
       script:
         - cd /home/ouadie/Game-backend
