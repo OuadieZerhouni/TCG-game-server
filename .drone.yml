@@ -16,6 +16,7 @@ steps:
       username: root
       key:
         from_secret: private_vm_ssh
+      debug: true
       port: 22
       script:
         - echo "Deploying to production server"
