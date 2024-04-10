@@ -6,6 +6,14 @@ trigger:
     - main
   event:
     - push
+
+
+# Test step
+steps:
+  - name: test
+    image: node:16.16
+    commands:
+      - echo "Testing the application"
 steps:
   - name: update-production
     image: appleboy/drone-ssh
