@@ -1,6 +1,6 @@
 kind: pipeline
 type: docker
-name: simple-test-log
+name: direct-execution
 
 trigger:
   branch:
@@ -9,7 +9,10 @@ trigger:
     - push
 
 steps:
-  - name: display-test-log
+  - name: execute-command
     image: alpine
+    debug: true
     commands:
-      - echo "Test log The pipeline is running successfully."
+      - echo "Executing command directly on the server."
+      - # Add any other shell commands you need to run here
+      - ls -l
