@@ -4,13 +4,12 @@ name: log-test
 
 trigger:
   branch:
-  - main
+    - main
   event:
-  - push
-
+    - push
 
 steps:
-- name: log-message
-  image: alpine
-  commands:
-  - echo "This 1 is a test log message from the Drone CI pipeline."
+  - name: log-message
+    image: alpine
+    commands:
+      - echo "This 1 is a test log message from the Drone CI pipeline."
