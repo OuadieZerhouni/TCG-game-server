@@ -15,8 +15,9 @@ steps:
       host: 188.166.85.184
       username: root
       key:
-        from_secret: private_key
+        from_secret: private_vm_ssh
       port: 22
       script:
+        - echo "Deploying to production server"
         - cd /home/ouadie/Game-backend
         - git pull
