@@ -5,7 +5,8 @@ name: log-test
 trigger:
   branch:
   - main
-  
+  event:
+  - push
 
 
 steps:
