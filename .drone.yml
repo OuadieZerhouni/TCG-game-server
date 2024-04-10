@@ -20,4 +20,3 @@ steps:
       script:
         - cd /home/ouadie/Game-backend
         - git pull
-        # Add any other commands needed for your deployment, like restarting services
