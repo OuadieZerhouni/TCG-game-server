@@ -1,6 +1,6 @@
 kind: pipeline
 type: docker
-name: default
+name: defaultss
 
 trigger:
   branch:
@@ -10,8 +10,11 @@ trigger:
 steps:
   - name: test-connection
     image: alpine
+    key:
+      from_secret: private_ssh_no_psfs
     commands:
-      - console.log("Hello World")
+      - echo "Hello, World!"
+      - echo "This is a test connection"
 # steps:
 #   - name: update-production
 #     image: appleboy/drone-ssh
