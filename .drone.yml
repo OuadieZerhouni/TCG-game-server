@@ -16,8 +16,8 @@ steps:
       username: root
       key:
         from_secret: private_key
-       port: 22
+      port: 22
       script:
         - cd /home/ouadie/Game-backend
         - git pull
-        - # Add any other commands needed for your deployment, like restarting services
+        # Add any other commands needed for your deployment, like restarting services
