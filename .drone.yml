@@ -1,18 +1,9 @@
 kind: pipeline
 type: docker
-name: direct-execution
-
-trigger:
-  branch:
-    - main
-  event:
-    - push
+name: log-test
 
 steps:
-  - name: execute-command
-    image: alpine
-    debug: true
-    commands:
-      - echo "Executing command directly on the server."
-      - # Add any other shell commands you need to run here
-      - ls -l
+- name: log-message
+  image: alpine
+  commands:
+  - echo "This is a test log message from the Drone CI pipeline."
