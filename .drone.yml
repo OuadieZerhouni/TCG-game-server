@@ -7,18 +7,22 @@ trigger:
     - main
   event:
     - push
-
 steps:
-  - name: update-production
-    image: appleboy/drone-ssh
-    settings:
-      host: 188.166.85.184
-      username: root
-      key:
-        from_secret: private_ssh_no_psf
-      debug: true
-      port: 22
-      script:
-        - echo "Deploying to production server"
-        - cd /home/ouadie/Game-backend
-        - git pull
+  - name: test-connection
+    image: alpine
+    commands:
+      - echo "Testing Drone Execution"
+# steps:
+#   - name: update-production
+#     image: appleboy/drone-ssh
+#     settings:
+#       host: 188.166.85.184
+#       username: root
+#       key:
+#         from_secret: private_ssh_no_psf
+#       debug: true
+#       port: 22
+#       script:
+#         - echo "Deploying to production server"
+#         - cd /home/ouadie/Game-backend
+#         - git pull
