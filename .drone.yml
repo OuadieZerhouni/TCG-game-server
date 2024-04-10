@@ -11,7 +11,7 @@ steps:
   - name: test-connection
     image: alpine
     commands:
-      - echo "Testing Drone Execution"
+      - console.log("Hello World")
 # steps:
 #   - name: update-production
 #     image: appleboy/drone-ssh
