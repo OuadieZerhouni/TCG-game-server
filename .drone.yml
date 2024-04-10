@@ -15,7 +15,7 @@ steps:
       host: 188.166.85.184
       username: root
       key:
-        from_secret: private_vm_ssh
+        from_secret: private_ssh_no_psf
       debug: true
       port: 22
       script:
