@@ -5,8 +5,10 @@
 const connectDB = require('./database'); // Replace with the actual path to your connection file.
 const express = require('express');
 const app = express();
-const port = 3000;
 const cors = require('cors');
+// imnport dotenv
+require('dotenv').config();
+const port = process.env.PORT_NUMBER;
 require('./socket')
 const corsOptions = {
   origin: '*',
