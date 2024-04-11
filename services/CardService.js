@@ -3,7 +3,7 @@
 
 
 
-const Card = require('../models/Card');
+const Card = require('../model/Card');
 
 /**
  * Service class for managing cards in the game.

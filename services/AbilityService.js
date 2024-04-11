@@ -3,7 +3,7 @@
 
 
 
-const Ability = require('../models/Ability');
+const Ability = require('../model/Ability');
 
 /**
  * Service class for managing abilities in the game.
