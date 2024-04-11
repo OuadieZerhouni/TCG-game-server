@@ -2,12 +2,6 @@ kind: pipeline
 type: docker
 name: log-test
 
-trigger:
-  branch:
-    - main
-  event:
-    - push
-
 steps:
   - name: log-message
     image: alpine
