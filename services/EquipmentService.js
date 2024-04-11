@@ -4,7 +4,7 @@
 /* Author: Ouadie ZERHOUNI
    Creation Date: 2024-01-28 01:21:48 */
 
-const Equipment = require('../models/equipment'); // Adjust the path as needed
+const Equipment = require('../models/Equipment'); // Adjust the path as needed
 
 /**
  * Service class for managing equipment in the game.

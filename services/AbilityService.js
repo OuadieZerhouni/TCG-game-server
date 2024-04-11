@@ -3,7 +3,7 @@
 
 
 
-const Ability = require('../models/ability');
+const Ability = require('../models/Ability');
 
 /**
  * Service class for managing abilities in the game.
@@ -24,7 +24,6 @@ class AbilityService {
       throw new Error('Unable to create ability : ' + error);
     }
   }
-
   /**
    * Find an ability by its ID.
    *

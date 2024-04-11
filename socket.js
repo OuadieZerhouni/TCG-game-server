@@ -6,7 +6,7 @@ const Room = require('./classes/Room');
 const server = http.createServer();
 const io = require('socket.io')(server);
 const User = require('./models/User');
-const Level = require('./models/level');
+const Level = require('./models/Level');
 
 const PORT = process.env.SOCKET_PORT || 5050;
 
@@ -26,7 +26,7 @@ io.on('connection', (socket) => {
          // Determine whose turn it is
          const currentPlayerTurn = room.turn % 2 === 0 ? 'first' : 'second';
 
-         // Populate cards.cardid with the card data
+         // Populate cards.cardId with the card data
          room.deck2?.populate('cards.cardId');
 
          room.deck1?.cards.forEach(card => {
