@@ -14,4 +14,4 @@ steps:
   - name: log-message
     image: alpine
     commands:
-      - echo "This is a test log message from the Drone CI pipeline."
+      - echo "This 1 is a test log message from the Drone CI pipeline."
