@@ -11,8 +11,9 @@ trigger:
   branch:
   - main
   event:
-  - push
-  - custom
+    include:
+      - push
+      - custom
 
 
 
