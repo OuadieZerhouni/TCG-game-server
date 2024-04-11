@@ -22,7 +22,10 @@ steps:
     image: alpine
     commands:
       - echo "This is a test log message from the Drone CI pipeline."
-      - ls -la
+      - cat .drone.yml
+      - git pull
+      - git status
+      - cat .drone.yml
 
 # trigger:
 #   event:
