@@ -3,10 +3,13 @@ type: docker
 name: default
 
 
+# trigger:
+#   event:
+#     - push
+#     - custom
 trigger:
-  event:
-    - push
-    - custom
+  branch:
+  - main
 
 
 steps:
