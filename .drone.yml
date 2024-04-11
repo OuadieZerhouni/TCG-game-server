@@ -1,6 +1,6 @@
 kind: pipeline
 type: docker
-name: log-test
+name: default
 
 trigger:
   branch:
