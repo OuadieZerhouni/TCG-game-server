@@ -39,4 +39,5 @@ steps:
         - eval "$(ssh-agent -s)"
         - ssh-add ~/.ssh/id_github
         - git pull
+        - npm install
         - echo 'drone working 2'
