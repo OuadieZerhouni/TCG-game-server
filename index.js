@@ -4,7 +4,9 @@
 
 const connectDB = require('./database'); // Replace with the actual path to your connection file.
 const express = require('express');
+const fs = require('fs');
 const app = express();
+const https = require('https');
 const cors = require('cors');
 // imnport dotenv
 require('dotenv').config();
@@ -78,7 +80,12 @@ app.get('/', (req, res) => {
 connectDB();
 
 
+const server = https.createServer({
+  key: fs.readFileSync('./node_certifs/server.key'),
+  cert: fs.readFileSync('./node_certifs/server.cert')
+}, app);
+
 // Run the server.
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
