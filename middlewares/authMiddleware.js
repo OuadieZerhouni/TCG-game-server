@@ -15,7 +15,7 @@ const JWT_SECRET  = process.env.JWT_SECRET;
  * @param {express.NextFunction} next - The next middleware function.
  */
 const checkJwt = (req, res, next) => {
-  const token = req.header('Authorization').split(' ')[1];
+  const token = req.header('Authorization')?.split(' ')[1];
   
 
   if (!token) {
