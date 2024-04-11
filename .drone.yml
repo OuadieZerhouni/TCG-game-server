@@ -7,13 +7,6 @@ steps:
     image: alpine
     commands:
       - echo "This 1 is a test log message from the Drone CI pipeline."
-    when:
-      event:
-        - push
-
-kind: pipeline
-type: docker
-name: default
 
 trigger:
   event:
