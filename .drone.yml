@@ -36,5 +36,7 @@ steps:
       script:
         - echo 'drone working'
         - cd /home/ouadie/Game-backend
+        - eval "$(ssh-agent -s)"
+        - ssh-add ~/.ssh/id_github
         - git pull
         - echo 'drone working 2'
