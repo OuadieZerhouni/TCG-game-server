@@ -4,7 +4,7 @@
 /* Author: Ouadie ZERHOUNI
    Creation Date: 2024-01-28 01:21:48 */
 const CardModel = require("../models/card");
-const User = require("../models/user"); // Adjust the path as needed
+const User = require("../models/User"); // Adjust the path as needed
 const bcrypt = require("bcrypt");
 
 /**

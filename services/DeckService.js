@@ -3,8 +3,8 @@
 
 
 
-const Deck = require('../models/deck');
-const UserCard = require('../models/userCard');
+const Deck = require('../models/Deck');
+const UserCard = require('../models/UserCard');
 
 /**
  * Service class for managing decks in the game.

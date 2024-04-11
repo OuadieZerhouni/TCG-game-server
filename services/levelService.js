@@ -6,7 +6,7 @@
 
 const mongoose = require('mongoose');
 const Level = require('../models/level'); // Adjust the import path as needed
-const { populate } = require('../models/deck');
+const { populate } = require('../models/Deck');
 
 /**
  * Create a new level.
