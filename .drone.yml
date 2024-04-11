@@ -10,6 +10,10 @@ name: default
 trigger:
   branch:
   - main
+  event:
+  - push
+  - custom
+
 
 
 steps:
