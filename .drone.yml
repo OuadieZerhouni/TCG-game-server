@@ -4,11 +4,9 @@ name: log-test
 
 trigger:
   branch:
-    include:
-    - main
+  - main
   event:
-    include:
-    - push
+  - push
 
 steps:
   - name: log-message
