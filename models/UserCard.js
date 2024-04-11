@@ -2,7 +2,7 @@
    Creation Date: 2024-01-28 01:22:07 */
 
 const mongoose = require('mongoose');
-const { populate } = require('./level');
+const { populate } = require('./Level');
 
 /**
  * Represents a card owned by a user in the game.

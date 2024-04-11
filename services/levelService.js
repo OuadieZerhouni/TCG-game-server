@@ -5,8 +5,8 @@
    Creation Date: 2024-01-28 01:21:48 */
 
 const mongoose = require('mongoose');
-const Level = require('../model/Level'); 
-const { populate } = require('../model/Deck');
+const Level = require('../models/Level'); 
+const { populate } = require('../models/Deck');
 
 /**
  * Create a new level.

@@ -5,8 +5,8 @@ const http = require('http');
 const Room = require('./classes/Room');
 const server = http.createServer();
 const io = require('socket.io')(server);
-const User = require('./model/User');
-const Level = require('./model/Level');
+const User = require('./models/User');
+const Level = require('./models/Level');
 
 const PORT = process.env.SOCKET_PORT || 5050;
 

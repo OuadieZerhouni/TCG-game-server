@@ -4,7 +4,7 @@
 /* Author: Ouadie ZERHOUNI
    Creation Date: 2024-01-28 01:21:48 */
 
-const UserCard = require('../model/UserCard'); // Adjust the path as needed
+const UserCard = require('../models/UserCard'); // Adjust the path as needed
 
 /**
  * Service class for managing user cards in the game.
