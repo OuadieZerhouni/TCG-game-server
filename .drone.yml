@@ -8,12 +8,12 @@ steps:
     commands:
       - echo "This 1 is a test log message from the Drone CI pipeline."
 
-trigger:
-  event:
-    - push
+# trigger:
+#   event:
+#     - push
 
-steps:
-- name: build
-  image: docker:latest
-  commands:
-    - echo "Building the Docker image..."
+# steps:
+# - name: build
+#   image: docker:latest
+#   commands:
+#     - echo "Building the Docker image..."
