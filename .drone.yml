@@ -4,9 +4,9 @@ name: default
 
 trigger:
   branch:
-  - main
+    - main
   event:
-  - push
+    - push
 
 steps:
   - name: log-message
