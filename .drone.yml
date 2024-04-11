@@ -6,6 +6,8 @@ name: default
 trigger:
   event:
     - push
+    - custom
+
 
 steps:
   - name: log-message
