@@ -75,11 +75,11 @@ app.get('/api/minVersion', (req, res) => {
 // app.use('/', kingdomRoute);
   res.json({ version: '0.1.0' });
 });
+// app.use('/api/abilities', abilityRoute);
+app.use('/data', express.static(__dirname + '/data'));
 
 app.use(checkJwt); // Register the checkJwt middleware.
 
-// app.use('/api/abilities', abilityRoute);
-app.use('/data', express.static(__dirname + '/data'));
 
 app.use('/api/abilities', abilityRoute); // Register the ability route.
 app.use('/api/decks', deckRoute); // Register the deck route.
