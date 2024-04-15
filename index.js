@@ -8,6 +8,7 @@ const fs = require('fs');
 const app = express();
 const https = require('https');
 const cors = require('cors');
+const jwt = require('jsonwebtoken')
 // imnport dotenv
 require('dotenv').config();
 const port = process.env.PORT_NUMBER;
@@ -46,6 +47,29 @@ const userCardRoute      = require('./routes/userCardRoute');
 
 app.use('/api/users', userRoute); // Register the user route.
 app.use('/api/cards', cardRoute); // Register the card route.
+
+// Admin Login Route in Express.js
+app.post('/api/admin/login', (req, res) => {
+  const { username, password } = req.body;
+  if (
+    username === process.env.ADMIN_USERNAME &&
+    password === process.env.ADMIN_PASSWORD
+  ) {
+    const payload = {
+      user: {
+        _id: -1,
+      },
+    };
+    // Create and send token
+    const token = jwt.sign(payload, process.env.JWT_SECRET, {
+      expiresIn: "2h",
+    });
+    res.json({ token });
+  } else {
+    res.status(401).send("Unauthorized");
+  }
+});
+
 
 app.get('/api/minVersion', (req, res) => {
 // app.use('/', kingdomRoute);
