@@ -6,13 +6,13 @@ const connectDB = require('./database'); // Replace with the actual path to your
 const express = require('express');
 const fs = require('fs');
 const app = express();
-const https = require('https');
+const https = require('http');
 const cors = require('cors');
 const jwt = require('jsonwebtoken')
 // imnport dotenv
 require('dotenv').config();
 const port = process.env.PORT_NUMBER;
-require('./socket')
+require('./socket/socket')
 const corsOptions = {
   origin: '*',
   credentials: true,
@@ -104,10 +104,14 @@ app.get('/', (req, res) => {
 connectDB();
 
 
-const server = https.createServer({
-  key: fs.readFileSync('./node_certifs/server.key'),
-  cert: fs.readFileSync('./node_certifs/server.cert')
-}, app);
+const server = https.createServer(
+//   {
+//   key: fs.readFileSync(process.env.SSL_KEY_PATH),
+//   cert: fs.readFileSync(process.env.SSL_CERT_PATH),
+// }, 
+{},
+app
+);
 
 // Run the server.
 server.listen(port, () => {
