@@ -33,48 +33,37 @@ class SocketHandler {
       const currentPlayerTurn = room.turn % 2 === 0 ? "first" : "second";
 
       // Populate cards.cardId with the card data
-      room.deck2?.populate("cards.cardId");
+      room.player1.deck?.populate("cards.cardId");
+      room.player2.deck?.populate("cards.cardId");
 
-      room.deck1?.cards.forEach((card) => {
-        let cardData = {
-          id: card._id.toString(),
-          name: card.cardId.name,
-          attack: card.attack,
-          blood: card.blood,
-          abilities: card.abilities,
-        };
-        gameData.deck1.push(cardData);
+      room.player1.deck.cards.forEach((card) => {
+        gameData.deck1.push(card);
       });
-      room.deck2?.cards.forEach((card) => {
-        let cardData = {
-          id: card._id.toString(),
-          name: card.cardId.name,
-          attack: card.attack,
-          blood: card.blood,
-          abilities: card.unlockedAbilities,
-        };
-        gameData.deck2.push(cardData);
+      console.log("gameData.deck1: ", room.player2.deck.cards);
+      room.player2.deck.cards.forEach((card) => {
+        gameData.deck2.push(card);
       });
-      console.log("gameData.deck1: ", gameData.deck1);
+
       // Draw a random card from the current player's deck
-      if (currentPlayerTurn === "first" && gameData.deck1.length > 0) {
-        console.log("first");
-        const randomIndex = Math.floor(Math.random() * gameData.deck1.length);
-        gameData.drawnCard = gameData.deck1.splice(randomIndex, 1)[0].id; // Remove the drawn card from the deck
-      } else if (currentPlayerTurn === "second" && gameData.deck2.length > 0) {
-        const randomIndex = Math.floor(Math.random() * gameData.deck2.length);
-        gameData.drawnCard = gameData.deck2[randomIndex].id;
-        console.log("second: ", gameData.deck2);
-        console.log("second");
-        console.log("gameData.drawnCard ", gameData.drawnCard);
-      }
+      // if (currentPlayerTurn === "first" && gameData.deck1.length > 0) {
+      const randomIndex = Math.floor(Math.random() * gameData.deck1.length);
+      gameData.drawnCard = gameData.deck1[randomIndex].id; // Get the id of the drawn card
+      console.log("gameData.deck1: ", gameData.deck1);
+      console.log("gameData.drawnCard: ", gameData.drawnCard);
+      console.log("*-----------------gameData.deck2: ", gameData.deck2);
+      // }
+      // else if (currentPlayerTurn === "second" && gameData.deck2.length > 0) {
+      //   const randomIndex = Math.floor(Math.random() * gameData.deck2.length);
+      //   gameData.drawnCard = gameData.deck2[randomIndex].id;
+      // }
 
-      //  console.log('sending game action to room: ', gameData);
-      socket.emit("gameAction", gameData);
+      console.log("sending game action to room: ", gameData);
+      socket.emit("initialAction", gameData);
     } else {
       socket.emit("roomNotFound", roomId);
     }
   }
+  
 
   handleGameEvent(roomId, eventData) {
     console.log(`Event in room ${roomId}: ${JSON.stringify(eventData)}`);
