@@ -10,6 +10,8 @@ class SocketHandler {
     this.io.on("connection", (socket) => {
       console.log(`User connected: ${socket.id}`);
       socket.on("joinRoom", (roomId) => this.handleJoinRoom(socket, roomId));
+      //playCard
+      socket.on("playCard", (userCard) => this.handlePlayCard(socket, userCard));
       socket.on("gameEvent", (roomId, eventData) =>
         this.handleGameEvent(roomId, eventData)
       );
@@ -70,9 +72,17 @@ class SocketHandler {
     this.io.to(roomId).emit("gameEvent", eventData);
   }
 
+
+
   handleDisconnect(socket) {
     console.log(`User disconnected: ${socket.id}`);
     // Todo: Remove the player from the room if they were in one
+  }
+
+
+  handlePlayCard(socket, userCard) {
+    console.log(userCard);
+    console.log(`User ${socket.id} playing card ${JSON.stringify(userCard)}`);
   }
 }
 
