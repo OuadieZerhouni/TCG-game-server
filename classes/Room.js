@@ -19,8 +19,8 @@ class Room {
    * @param {Number} turn - The current turn number.
    * @param {Number} duration - The duration of the game.
    * @param {Date} startDate - The start date of the game.
-   * @param {Array} deck1 - The deck of player 1.
-   * @param {Array} deck2 - The deck of player 2.
+   * @param {Deck} deck1 - The deck of player 1.
+   * @param {Deck} deck2 - The deck of player 2.
    * @param {Number} blood1 - The blood of player 1.
    * @param {Number} blood2 - The blood of player 2.
    */
@@ -74,6 +74,16 @@ class Room {
     return Room.rooms.find(
       (room) => room.player1.id === Id || room.player2.id === Id
     );
+  }
+
+  playCardToField(playerId, cardId) {
+    const player = this.player1.id === playerId ? this.player1 : this.player2;
+    return player.playCardToField(cardId);
+  }
+
+  drawCard(playerId) {
+    const player = this.player1.id === playerId ? this.player1 : this.player2;
+    return player.drawCard();
   }
 }
 
