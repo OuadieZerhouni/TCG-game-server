@@ -23,6 +23,7 @@ class Room {
    * @param {Deck} deck2 - The deck of player 2.
    * @param {Number} blood1 - The blood of player 1.
    * @param {Number} blood2 - The blood of player 2.
+   * @param {Boolean} isPvP - Whether the game is player vs player or player vs AI.
    */
   constructor(
     Id,
@@ -34,15 +35,21 @@ class Room {
     deck1,
     deck2,
     blood1,
-    blood2
+    blood2,
+    isPvP = true
   ) {
-    this.Id = Id;
-    this.player1 = new Player(player1_id, deck1, blood1);
-    this.player2 = new Player(player2_id, deck2, blood2);
-    this.turn = turn;
-    this.duration = duration;
-    this.startDate = startDate;
+    this.Id           = Id;
+    this.player1      = new Player(player1_id, deck1, blood1);
+    this.player2      = new Player(player2_id, deck2, blood2);
+    this.turn         = turn;
+    this.duration     = duration;
+    this.startDate    = startDate;
+    this.isPvP        = isPvP;
+    this.readyPlayers = [];
+    console.log("Room created");
     Room.rooms.push(this);
+    console.log("Room added to rooms array: ", Room.rooms);
+
   }
 
   /**

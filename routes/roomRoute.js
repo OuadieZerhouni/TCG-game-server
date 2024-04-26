@@ -3,7 +3,7 @@
 const express = require('express');
 const router = express.Router();
 const levelService = require('../services/levelService');
-const Room = require('../classes/Room');
+const Room = require('../classes/battle/Room');
 const { decodeToken } = require('../services/jwtServices');
 const UserService = require('../services/userService');
 const { v4: uuidv4 } = require('uuid');
@@ -24,7 +24,7 @@ router.post('/', async (req, res) => {
             const deck1  = player1.deck;
             const deck2  = level.deck;
             const roomId = uuidv4();
-            const room   = new Room(roomId, player1.id, level._id, 1, 0, new Date(), deck1, deck2, 2000, 2000);
+            const room   = new Room(roomId, player1.id, level._id, 1, 0, new Date(), deck1, deck2, 2000, 2000, false);
             res.status(201).json({ roomId: roomId , port : process.env.SOCKET_PORT});
         }
         // else if(battleType === 'online') {

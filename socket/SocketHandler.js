@@ -1,6 +1,6 @@
-const Room = require('../classes/Room');
 const { checkJwtSocket } = require('../middlewares/authMiddleware');
 require('dotenv').config();
+const Room = require('../classes/battle/Room');
 
 class SocketHandler {
   constructor(io) {
@@ -18,6 +18,7 @@ class SocketHandler {
         socket.on("playCardRequest", (userCard) =>
           this.handlePlayCardToFieldRequest(socket, userCard)
         );
+        socket.on("readyForBattle", () => this.handleReadyForBattleRequest(socket));
         socket.on("gameEvent", (roomId, eventData) =>
           this.handleGameEvent(roomId, eventData)
         );
@@ -28,6 +29,8 @@ class SocketHandler {
   handleJoinRoom(socket, roomId) {
     console.log(`User ${socket.id} joining room ${roomId}`);
     const room = Room.findRoomById(roomId);
+    console.log(roomId);
+    console.log(Room.rooms);
     if (room) {
       // Add the player to the room
       socket.join(roomId);
@@ -36,10 +39,9 @@ class SocketHandler {
         deck2: [],
         drawnCard: null,
         initialData: true,
+        localPlayerId: socket.user._id,
+        OpponentId: room.player1.id === socket.user._id ? room.player2.id : room.player1.id,
       };
-      // Determine whose turn it is
-      const currentPlayerTurn = room.turn % 2 === 0 ? "first" : "second";
-
       // Populate cards.cardId with the card data
       room.player1.deck?.populate("cards.cardId");
       room.player2.deck?.populate("cards.cardId");
@@ -50,17 +52,7 @@ class SocketHandler {
       room.player2.deck.cards.forEach((card) => {
         gameData.deck2.push(card);
       });
-
-      // Draw a random card from the current player's deck
-      // if (currentPlayerTurn === "first" && gameData.deck1.length > 0) {
-      // const randomIndex = Math.floor(Math.random() * gameData.deck1.length);
-      gameData.drawnCard = room.drawCard(room.player1.id)._id;
-      // }
-      // else if (currentPlayerTurn === "second" && gameData.deck2.length > 0) {
-      //   const randomIndex = Math.floor(Math.random() * gameData.deck2.length);
-      //   gameData.drawnCard = gameData.deck2[randomIndex].id;
-      // }
-
+      console.log(gameData);
       socket.emit("initialAction", gameData);
     } else {
       socket.emit("roomNotFound", roomId);
@@ -74,7 +66,34 @@ class SocketHandler {
 
   handleDisconnect(socket) {
     console.log(`User disconnected: ${socket.id}`);
-    // Todo: Remove the player from the room if they were in one
+    const room = Room.findRoomByPlayerId(socket.user._id);
+    room?.readyPlayers.pop(socket.user._id);
+    if(room.readyPlayers.length === 0) {
+      Room.deleteRoomById(room.Id);
+    }
+  }
+
+  handleDrawCardRequest(socket) {
+    // get the room
+    const room = Room.findRoomByPlayerId(socket.user._id);
+    if (!room) {
+      console.error(`User ${socket.user._id} is not in a room`);
+      return;
+    }
+    console.log(`User ${socket.user._id} is drawing a card`);
+    const drawnCard = room.drawCard(socket.user._id);
+    if (drawnCard) {
+      console.log(`User ${socket.user._id} drew card ${drawnCard.cardId}`);
+      console.log(room.turn);
+      this.io.to(room.Id).emit("action", {
+        turn: room.turn++,
+        actionType: "drawCard",
+        playerId: socket.user._id,
+        initiatorId: drawnCard._id,
+      });
+    } else {
+      console.error(`User ${socket.user._id} could not draw a card`);
+    }
   }
 
   /**
@@ -90,7 +109,34 @@ class SocketHandler {
       console.error(`User ${socket.user._id} is not in a room`);
       return;
     }
-    room.playCardToField(socket.user._id, userCard.cardId);
+    const playedCard = room.playCardToField(socket.user._id, userCard.cardId);
+    if (playedCard) {
+      console.log(`User ${socket.user._id} played card ${userCard.cardId}`);
+      this.io.to(room.Id).emit("action", {
+        turn: room.turn++,
+        actionType: "playCard",
+        playerId: socket.user._id,
+        initiatorId: playedCard._id,
+      });
+    } else {
+      console.error(`User ${socket.user._id} could not play card ${userCard.cardId}`);
+    }
+  }
+
+  handleReadyForBattleRequest(socket) {
+    // get the room
+    const room = Room.findRoomByPlayerId(socket.user._id);
+    console.log(`User ${socket.user._id} is ready for battle`);
+    if (!room) {
+      console.error(`User ${socket.user._id} is not in a room`);
+      return;
+    }
+    room.readyPlayers.push(socket.user._id);
+    console.log(`Room pvp ${room.isPvP} has ${room.readyPlayers.length} ready players`);
+    if ((room.isPvP && room.readyPlayers.length === 2) || (!room.isPvP && room.readyPlayers.length === 1)) {
+      // Start the game
+      this.handleDrawCardRequest(socket);
+    }
   }
 }
 

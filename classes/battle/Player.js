@@ -45,7 +45,6 @@ class Player {
     if (cardIndex !== -1) {
       const card = this.hand.splice(cardIndex, 1)[0];
       this.field.push(card);
-      console.log(`Player ${this.id} played card ${cardId} to the field ${this.field} deck ${this.deck}`);
       return card;
     }
     console.error(`Card with id ${cardId} not found in player's ${this.id} hand`);
