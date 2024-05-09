@@ -52,7 +52,6 @@ class SocketHandler {
       room.player2.deck.cards.forEach((card) => {
         gameData.deck2.push(card);
       });
-      console.log(gameData);
       socket.emit("initialAction", gameData);
     } else {
       socket.emit("roomNotFound", roomId);
@@ -68,13 +67,14 @@ class SocketHandler {
     console.log(`User disconnected: ${socket.id}`);
     const room = Room.findRoomByPlayerId(socket.user._id);
     room?.readyPlayers.pop(socket.user._id);
-    if(room.readyPlayers.length === 0) {
+    if(room?.readyPlayers.length === 0) {
       Room.deleteRoomById(room.Id);
     }
   }
 
   handleDrawCardRequest(socket) {
     // get the room
+    console.log('draw card request');
     const room = Room.findRoomByPlayerId(socket.user._id);
     if (!room) {
       console.error(`User ${socket.user._id} is not in a room`);
