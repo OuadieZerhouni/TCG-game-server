@@ -52,6 +52,11 @@ class Room {
 
   }
 
+  chooseFirstPlayer() {
+    const randomIndex = Math.floor(Math.random() * 2);
+    return randomIndex === 0 ? this.player1.id : this.player2.id;
+  }
+  
   /**
    * Finds a room by its ID.
    * @static
@@ -59,6 +64,8 @@ class Room {
    * @returns {Room} The room with the given ID.
    */
   static findRoomById(Id) {
+    // log all rooms ids
+    console.log("Rooms ids: ", Room.rooms);
     return Room.rooms.find((room) => room.Id === Id);
   }
 

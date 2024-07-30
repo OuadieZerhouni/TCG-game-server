@@ -27,13 +27,12 @@ class SocketHandler {
   }
 
   handleJoinRoom(socket, roomId) {
-    console.log(`User ${socket.id} joining room ${roomId}`);
     const room = Room.findRoomById(roomId);
-    console.log(roomId);
-    console.log(Room.rooms);
     if (room) {
       // Add the player to the room
+
       socket.join(roomId);
+      console.log(`User ${socket.id} joining room ${roomId}`);
       let gameData = {
         deck1: [],
         deck2: [],
@@ -52,9 +51,13 @@ class SocketHandler {
       room.player2.deck.cards.forEach((card) => {
         gameData.deck2.push(card);
       });
+
       socket.emit("initialAction", gameData);
+    console.log(`User ${socket.id} joining room ${roomId}`);
+
     } else {
       socket.emit("roomNotFound", roomId);
+      console.error(`Room ${roomId} not found for user ${socket.id}`);
     }
   }
 
@@ -74,17 +77,13 @@ class SocketHandler {
 
   handleDrawCardRequest(socket) {
     // get the room
-    console.log('draw card request');
     const room = Room.findRoomByPlayerId(socket.user._id);
     if (!room) {
       console.error(`User ${socket.user._id} is not in a room`);
       return;
     }
-    console.log(`User ${socket.user._id} is drawing a card`);
     const drawnCard = room.drawCard(socket.user._id);
     if (drawnCard) {
-      console.log(`User ${socket.user._id} drew card ${drawnCard.cardId}`);
-      console.log(room.turn);
       this.io.to(room.Id).emit("action", {
         turn: room.turn++,
         actionType: "drawCard",
@@ -102,7 +101,6 @@ class SocketHandler {
    * @param {object} userCard - The card the player wants to play
    */
   handlePlayCardToFieldRequest(socket, userCard) {
-    console.log(socket.user);
     // get the room
     const room = Room.findRoomByPlayerId(socket.user._id);
     if (!room) {
@@ -123,18 +121,16 @@ class SocketHandler {
     }
   }
 
+  // Update handleReadyForBattleRequest in SocketHandler
   handleReadyForBattleRequest(socket) {
-    // get the room
     const room = Room.findRoomByPlayerId(socket.user._id);
-    console.log(`User ${socket.user._id} is ready for battle`);
     if (!room) {
       console.error(`User ${socket.user._id} is not in a room`);
       return;
     }
     room.readyPlayers.push(socket.user._id);
-    console.log(`Room pvp ${room.isPvP} has ${room.readyPlayers.length} ready players`);
+
     if ((room.isPvP && room.readyPlayers.length === 2) || (!room.isPvP && room.readyPlayers.length === 1)) {
-      // Start the game
       this.handleDrawCardRequest(socket);
     }
   }
