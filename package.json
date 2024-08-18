@@ -4,7 +4,7 @@
   "description": "backend express server for Realm of Cards game",
   "main": "index.js",
   "scripts": {
-    "test": "nodemon index.js"
+    "test": "nodemon src/index.js"
   },
   "author": "Ouadie ZERHOUNI",
   "license": "ISC",
