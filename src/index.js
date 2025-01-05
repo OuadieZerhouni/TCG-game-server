@@ -2,7 +2,7 @@
    Creation Date: 2024-01-28 01:22:07 */
 
 
-const connectDB = require('./database'); // Replace with the actual path to your connection file.
+const connectDB = require('../Config/database'); // Replace with the actual path to your connection file.
 const express = require('express');
 const fs = require('fs');
 const app = express();
