@@ -99,7 +99,7 @@ class SocketHandler {
     }
 
     this.io.to(room.id).emit("action", {
-      turn: room.turn++,
+      turn: room.turn,
       actionType: "playCard",
       playerId: socket.user._id,
       initiatorId: playedCard.id,
