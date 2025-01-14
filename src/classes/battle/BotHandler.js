@@ -24,19 +24,19 @@ class BotHandler {
     console.log('-----------');
     console.log(bot);
     // sleep for 2 seconds
-    setTimeout(() => {
+    // setTimeout(() => {
       if (bot.hand.length > 0) {
         const playedCard = bot.playCardToField(bot.hand[0].id);
         if (playedCard) {
-          this.io.to(room.id).emit("action", {  
+          return  {  
             turn: room.turn++,
             actionType: "playCard",
             playerId: bot.id,
             initiatorId: playedCard.id,
-          });
+          };
         }
       }
-    }, 2000);
+    // }, 2000);
 
 
 

@@ -1,19 +1,24 @@
-const { checkJwtSocket } = require('../middlewares/authMiddleware');
-require('dotenv').config();
-const Room = require('../classes/battle/Room');
-const BotHandler = require('../classes/battle/BotHandler'); // Import the BotHandler
+
+const Room = require("../classes/battle/Room");
+const BotHandler = require("../classes/battle/BotHandler");
+const {checkJwtSocket} = require("../middlewares/authMiddleware");
+
+
 
 class SocketHandler {
   constructor(io) {
     this.io = io;
-    this.botHandler = new BotHandler(io); // Initialize the BotHandler
-    this.rooms = {}; // This could also be moved to a separate RoomManager if needed
+    this.botHandler = new BotHandler(io);
+    this.rooms = {};
+    this.actionQueue = {}; // Add an action queue for each room
   }
 
   initializeSocketEvents() {
-    this.io
-      .use(checkJwtSocket)
-      .on("connection", (socket) => {
+    this.io.use((socket, next) => {
+      checkJwtSocket(socket, next);
+    });
+
+    this.io.on("connection", (socket) => {
         console.log(`User connected: ${socket.id}`);
         socket.on("joinRoom", (roomId) => this.handleJoinRoom(socket, roomId));
         socket.on("playCardRequest", (userCard) => this.handlePlayCardToFieldRequest(socket, userCard));
@@ -48,7 +53,7 @@ class SocketHandler {
 
   handleGameEvent(roomId, eventData) {
     console.log(`Event in room ${roomId}: ${JSON.stringify(eventData)}`);
-    this.io.to(roomId).emit("gameEvent", eventData);
+    this.addToActionQueue(roomId, eventData);
   }
 
   handleDisconnect(socket) {
@@ -75,14 +80,14 @@ class SocketHandler {
       return;
     }
 
-    this.io.to(room.id).emit("action", {
+    this.addToActionQueue(room.id, {
       turn: room.turn++,
       actionType: "drawCard",
       playerId: playerId,
       initiatorId: drawnCard.id,
     });
 
-    return drawnCard; // Return the drawn card in case it's needed later
+    return drawnCard;
   }
 
   handlePlayCardToFieldRequest(socket, userCard) {
@@ -98,20 +103,20 @@ class SocketHandler {
       return;
     }
 
-    this.io.to(room.id).emit("action", {
+    this.addToActionQueue(room.id, {
       turn: room.turn,
       actionType: "playCard",
       playerId: socket.user._id,
       initiatorId: playedCard.id,
     });
 
-    // After the player plays, check if it's a bot's turn and handle accordingly
     if (!room.isPvP) {
       const botDrawnCard = this.handleDrawCardRequest(socket, room.player2.id);
-      this.botHandler.handleBotTurn(room, botDrawnCard); // Pass the drawn card to the bot's handler
-      this.handleDrawCardRequest(socket, socket.user._id); // Draw a card for the player after the
+      var botAction = this.botHandler.handleBotTurn(room, botDrawnCard);
+      this.addToActionQueue(room.id, botAction);
+      this.handleDrawCardRequest(socket, socket.user._id);
     } else {
-      this.handleDrawCardRequest(socket, room.getNextPlayerId(socket.user._id)); // Move to the next player's turn in PvP
+      this.handleDrawCardRequest(socket, room.getNextPlayerId(socket.user._id));
     }
   }
 
@@ -125,8 +130,24 @@ class SocketHandler {
     room.readyPlayers.push(socket.user._id);
 
     if ((room.isPvP && room.readyPlayers.length === 2) || (!room.isPvP && room.readyPlayers.length === 1)) {
-      this.handleDrawCardRequest(socket, socket.user._id); // Draw card for the player who is ready
+      this.handleDrawCardRequest(socket, socket.user._id);
     }
+  }
+
+  addToActionQueue(roomId, action) {
+    if (!this.actionQueue[roomId]) {
+      this.actionQueue[roomId] = [];
+    }
+    console.log(`Adding action to queue for room ${roomId}: ${JSON.stringify(action)}`);
+    this.actionQueue[roomId].push(action);
+
+    // Emit batched actions after a short delay
+    setTimeout(() => {
+      if (this.actionQueue[roomId].length > 0) {
+        this.io.to(roomId).emit("actions", this.actionQueue[roomId]);
+        this.actionQueue[roomId] = [];
+      }
+    }, 100); // Adjust the delay as needed
   }
 }
 
