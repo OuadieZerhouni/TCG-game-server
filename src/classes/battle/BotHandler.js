@@ -21,21 +21,19 @@ class BotHandler {
     //   initiatorId: drawnCard.id,
     // });
 
-    console.log('-----------');
-    console.log(bot);
     // sleep for 2 seconds
     // setTimeout(() => {
-      if (bot.hand.length > 0) {
-        const playedCard = bot.playCardToField(bot.hand[0].id);
-        if (playedCard) {
-          return  {  
-            turn: room.turn++,
-            actionType: "playCard",
-            playerId: bot.id,
-            initiatorId: playedCard.id,
-          };
-        }
+    if (bot.hand.length > 0) {
+      const playedCard = bot.playCardToField(bot.hand[0].id);
+      if (playedCard) {
+        return {
+          turn: room.turn++,
+          actionType: "playCard",
+          playerId: bot.id,
+          initiatorCard: playedCard,
+        };
       }
+    }
     // }, 2000);
 
 

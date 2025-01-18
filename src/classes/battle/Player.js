@@ -1,3 +1,5 @@
+ 
+
 class Player {
   /**
    * 
@@ -7,8 +9,11 @@ class Player {
    */
   constructor(id, deck, blood) {
     this.id = id;
+    /** @type {Deck} */
     this.deck = deck;
+    /** @type {Card[]} */
     this.hand = [];
+    /** @type {Card[]} */
     this.field = [];
     this.blood = blood;
   }
@@ -26,6 +31,27 @@ class Player {
     const card = this.hand.splice(cardIndex, 1)[0];
     this.field.push(card);
     return card;
+  }
+  /**
+   * 
+   * @param {*} attackValue 
+   * @param {*} attackedCardIndexOnField 
+   * @returns Card
+   */
+  takeAttack(attackValue, attackedCardIndexOnField) {
+    const attackedCard = this.field[attackedCardIndexOnField];
+    if (!attackedCard) {
+      console.error(`Invalid attacked card index: ${attackedCardIndexOnField}`);
+      return null;
+    }
+    attackedCard.blood -= attackValue;
+    return attackedCard;
+  }
+
+  getCardIndexOnField(cardId) {
+    console.log(this.field);
+    return this.field.findIndex((card) => card.id === cardId
+    );
   }
 
   /**

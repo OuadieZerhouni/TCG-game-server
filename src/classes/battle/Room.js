@@ -15,6 +15,20 @@ class Room {
     Room.rooms.push(this);
   }
 
+  attackCard(playerId, cardId) {
+    const [attackerPlayer, attackedPlayer] = this.player1.id === playerId ? [this.player1, this.player2] : [this.player2, this.player1];
+    const attackerCard = attackerPlayer.field.filter((card) => card.id === cardId)[0];
+    if (!attackerCard) {
+      console.error(`Player ${playerId} could not find card ${cardId} to attack`);
+      return null;
+    }
+    // index of the attacked card
+    const attackedCard = attackedPlayer.takeAttack(attackerCard.attack, attackerPlayer.getCardIndexOnField(cardId));
+
+    return [attackerCard, attackedCard];
+    
+  }
+
   chooseFirstPlayer() {
     return Math.random() < 0.5 ? this.player1.id : this.player2.id;
   }
