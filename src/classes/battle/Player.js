@@ -32,6 +32,7 @@ class Player {
     this.field.push(card);
     return card;
   }
+
   /**
    * 
    * @param {*} attackValue 
@@ -45,6 +46,9 @@ class Player {
       return null;
     }
     attackedCard.blood -= attackValue;
+    if (attackedCard.blood <= 0) {
+      attackedCard.blood = 0;
+    }
     return attackedCard;
   }
 

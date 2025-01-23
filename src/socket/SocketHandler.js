@@ -85,6 +85,8 @@ class SocketHandler {
       return;
     }
 
+
+
     this.addToActionQueue(room.id, {
       turn: room.turn,
       actionType: "attackCard",
@@ -94,7 +96,7 @@ class SocketHandler {
     });
 
     // if blood is 0 or less,  send unalive action
-    if (attackedCard.blood <= 0) {
+    if (attackedCard.blood == 0) {
       this.addToActionQueue(room.id, {
         turn: room.turn,
         actionType: "unAlive",
