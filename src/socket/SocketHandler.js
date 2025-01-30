@@ -85,10 +85,8 @@ class SocketHandler {
       return;
     }
 
-
-
     this.addToActionQueue(room.id, {
-      turn: room.turn,
+      turn: room.turn++,
       actionType: "attackCard",
       playerId: socket.user._id,
       initiatorCard: attackerCard,
@@ -105,12 +103,12 @@ class SocketHandler {
       });
     }
 
-    // if (!room.isPvP) {
-    //   const botDrawnCard = this.handleDrawCardRequest(socket, room.player2.id);
-    //   var botAction = this.botHandler.handleBotTurn(room, botDrawnCard);
-    //   this.addToActionQueue(room.id, botAction);
-    //   this.handleDrawCardRequest(socket, socket.user._id);
-    // }
+    if (!room.isPvP) {
+      const botDrawnCard = this.handleDrawCardRequest(socket, room.player2.id);
+      var botAction = this.botHandler.handleBotTurn(room);
+      this.addToActionQueue(room.id, botAction);
+      this.handleDrawCardRequest(socket, socket.user._id);
+    }
   }
 
 
@@ -159,7 +157,7 @@ class SocketHandler {
 
     if (!room.isPvP) {
       const botDrawnCard = this.handleDrawCardRequest(socket, room.player2.id);
-      var botAction = this.botHandler.handleBotTurn(room, botDrawnCard);
+      var botAction = this.botHandler.handleBotTurn(room);
       this.addToActionQueue(room.id, botAction);
       this.handleDrawCardRequest(socket, socket.user._id);
     } else {

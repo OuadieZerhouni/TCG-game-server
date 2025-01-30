@@ -8,21 +8,7 @@ class BotHandler {
   handleBotTurn(room) {
     /** @var {Player} bot */
     const bot = room.player2; // Assuming player2 is the bot
-    // const drawnCard = bot.drawCard();
-    // if (!drawnCard) {
-    //   console.error(`Bot could not draw a card`);
-    //   return;
-    // }
 
-    // this.io.to(room.id).emit("action", {
-    //   turn: room.turn++,
-    //   actionType: "drawCard",
-    //   playerId: bot.id,
-    //   initiatorId: drawnCard.id,
-    // });
-
-    // sleep for 2 seconds
-    // setTimeout(() => {
     if (bot.hand.length > 0) {
       const playedCard = bot.playCardToField(bot.hand[0].id);
       if (playedCard) {
@@ -34,7 +20,16 @@ class BotHandler {
         };
       }
     }
-    // }, 2000);
+    else if (bot.field.length > 0) {
+      const [attackerCard, attackedCard] = room.attackCard(bot.id, bot.field[0].id);
+      return {
+        turn: room.turn++,
+        actionType: "attackCard",
+        playerId: bot.id,
+        initiatorCard: attackerCard,
+        targetCardList: [attackedCard],
+      };
+    }
 
 
 
