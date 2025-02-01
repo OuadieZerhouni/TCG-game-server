@@ -8,14 +8,15 @@ class Player {
    * @param {number} blood
    */
   constructor(id, deck, blood) {
-    this.id = id;
+    this.id        = id;
     /** @type {Deck} */
-    this.deck = deck;
+    this.deck      = deck;
     /** @type {Card[]} */
-    this.hand = [];
+    this.hand      = [];
     /** @type {Card[]} */
-    this.field = [];
-    this.blood = blood;
+    this.field     = [];
+    this.graveyard = [];
+    this.blood     = blood;
   }
 
   /**
@@ -48,6 +49,8 @@ class Player {
     attackedCard.blood -= attackValue;
     if (attackedCard.blood <= 0) {
       attackedCard.blood = 0;
+      this.graveyard.push(attackedCard);
+      this.field.splice(attackedCardIndexOnField, 1);
     }
     return attackedCard;
   }

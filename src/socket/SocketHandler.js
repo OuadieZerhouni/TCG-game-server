@@ -19,11 +19,10 @@ class SocketHandler {
 
     this.io.on("connection", (socket) => {
       console.log(`User connected: ${socket.id}`);
-      socket.on("joinRoom", (roomId) => this.handleJoinRoom(socket, roomId));
-      socket.on("playCardRequest", (userCard) => this.handlePlayCardToFieldRequest(socket, userCard));
-      socket.on("readyForBattle", () => this.handleReadyForBattleRequest(socket));
-      socket.on("gameEvent", (roomId, eventData) => this.handleGameEvent(roomId, eventData));
-      socket.on("disconnect", () => this.handleDisconnect(socket));
+      socket.on("joinRoom", (roomId)            => this.handleJoinRoom(socket, roomId));
+      socket.on("playCardRequest", (userCard)   => this.handlePlayCardToFieldRequest(socket, userCard));
+      socket.on("readyForBattle", ()            => this.handleReadyForBattleRequest(socket));
+      socket.on("disconnect", ()                => this.handleDisconnect(socket));
       socket.on("attackCardRequest", (userCard) => this.handleAttackCardRequest(socket, userCard));
     });
   }
@@ -56,10 +55,6 @@ class SocketHandler {
     socket.emit("initialAction", gameData);
   }
 
-  handleGameEvent(roomId, eventData) {
-    console.log(`Event in room ${roomId}: ${JSON.stringify(eventData)}`);
-    this.addToActionQueue(roomId, eventData);
-  }
 
   handleDisconnect(socket) {
     console.log(`User disconnected: ${socket.id}`);
@@ -94,10 +89,11 @@ class SocketHandler {
     });
 
     // if blood is 0 or less,  send unalive action
+    console.log(attackedCard);
     if (attackedCard.blood == 0) {
       this.addToActionQueue(room.id, {
         turn: room.turn,
-        actionType: "unAlive",
+        actionType: "killCard",
         playerId: socket.user._id,
         targetCardList: [attackedCard],
       });
@@ -105,8 +101,10 @@ class SocketHandler {
 
     if (!room.isPvP) {
       const botDrawnCard = this.handleDrawCardRequest(socket, room.player2.id);
-      var botAction = this.botHandler.handleBotTurn(room);
-      this.addToActionQueue(room.id, botAction);
+      var botActionArray  = this.botHandler.handleBotTurn(room);
+      botActionArray.forEach(botAction => {
+        this.addToActionQueue(room.id, botAction);
+      });
       this.handleDrawCardRequest(socket, socket.user._id);
     }
   }
@@ -157,8 +155,10 @@ class SocketHandler {
 
     if (!room.isPvP) {
       const botDrawnCard = this.handleDrawCardRequest(socket, room.player2.id);
-      var botAction = this.botHandler.handleBotTurn(room);
-      this.addToActionQueue(room.id, botAction);
+      var botActionArray = this.botHandler.handleBotTurn(room);
+      botActionArray.forEach(botAction => {
+        this.addToActionQueue(room.id, botAction);
+      });
       this.handleDrawCardRequest(socket, socket.user._id);
     } else {
       this.handleDrawCardRequest(socket, room.getNextPlayerId(socket.user._id));
@@ -183,16 +183,15 @@ class SocketHandler {
     if (!this.actionQueue[roomId]) {
       this.actionQueue[roomId] = [];
     }
-    console.log(`Adding action to queue for room ${roomId}: ${JSON.stringify(action)}`);
     this.actionQueue[roomId].push(action);
 
     // Emit batched actions after a short delay
-    setTimeout(() => {
+    // setTimeout(() => {
       if (this.actionQueue[roomId].length > 0) {
         this.io.to(roomId).emit("actions", this.actionQueue[roomId]);
         this.actionQueue[roomId] = [];
       }
-    }, 100); // Adjust the delay as needed
+    // }, 100); // Adjust the delay as needed
   }
 }
 
