@@ -1,15 +1,14 @@
 const Room = require("../classes/battle/Room");
 const BotHandler = require("../classes/battle/BotHandler");
+const GameEngine = require("../classes/battle/GameEngine");
 const { checkJwtSocket } = require("../middlewares/authMiddleware");
-
-
 
 class SocketHandler {
   constructor(io) {
     this.io = io;
     this.botHandler = new BotHandler(io);
+    this.gameEngine = new GameEngine();
     this.rooms = {};
-    this.actionQueue = {}; // Add an action queue for each room
   }
 
   initializeSocketEvents() {
@@ -19,10 +18,10 @@ class SocketHandler {
 
     this.io.on("connection", (socket) => {
       console.log(`User connected: ${socket.id}`);
-      socket.on("joinRoom", (roomId)            => this.handleJoinRoom(socket, roomId));
-      socket.on("playCardRequest", (userCard)   => this.handlePlayCardToFieldRequest(socket, userCard));
-      socket.on("readyForBattle", ()            => this.handleReadyForBattleRequest(socket));
-      socket.on("disconnect", ()                => this.handleDisconnect(socket));
+      socket.on("joinRoom", (roomId) => this.handleJoinRoom(socket, roomId));
+      socket.on("playCardRequest", (userCard) => this.handlePlayCardToFieldRequest(socket, userCard));
+      socket.on("readyForBattle", () => this.handleReadyForBattleRequest(socket));
+      socket.on("disconnect", () => this.handleDisconnect(socket));
       socket.on("attackCardRequest", (userCard) => this.handleAttackCardRequest(socket, userCard));
     });
   }
@@ -55,7 +54,6 @@ class SocketHandler {
     socket.emit("initialAction", gameData);
   }
 
-
   handleDisconnect(socket) {
     console.log(`User disconnected: ${socket.id}`);
     const room = Room.findRoomByPlayerId(socket.user._id);
@@ -74,41 +72,38 @@ class SocketHandler {
       return;
     }
 
-    const [attackerCard, attackedCard] = room.attackCard(socket.user._id, userCard.cardId);
+    const [attackerCard, attackedCard] = this.gameEngine.attackCard(room, socket.user._id, userCard.cardId);
     if (!attackedCard) {
       console.error(`User ${socket.user._id} could not attack card ${userCard.cardId}`);
       return;
     }
 
-    this.addToActionQueue(room.id, {
+    const attackAction = {
       turn: room.turn++,
       actionType: "attackCard",
       playerId: socket.user._id,
       initiatorCard: attackerCard,
       targetCardList: [attackedCard],
-    });
+    };
+    this.io.to(room.id).emit("actions", [attackAction]);
 
-    // if blood is 0 or less,  send unalive action
-    console.log(attackedCard);
     if (attackedCard.blood == 0) {
-      this.addToActionQueue(room.id, {
+      const killAction = {
         turn: room.turn,
         actionType: "killCard",
         playerId: socket.user._id,
         targetCardList: [attackedCard],
-      });
+      };
+      this.io.to(room.id).emit("actions", [killAction]);
     }
 
     if (!room.isPvP) {
       const botDrawnCard = this.handleDrawCardRequest(socket, room.player2.id);
-      var botActionArray  = this.botHandler.handleBotTurn(room);
-      botActionArray.forEach(botAction => {
-        this.addToActionQueue(room.id, botAction);
-      });
+      const botActionArray = this.botHandler.handleBotTurn(room);
+      this.io.to(room.id).emit("actions", botActionArray);
       this.handleDrawCardRequest(socket, socket.user._id);
     }
   }
-
 
   handleDrawCardRequest(socket, playerId) {
     const room = Room.findRoomByPlayerId(playerId);
@@ -117,18 +112,19 @@ class SocketHandler {
       return;
     }
 
-    const drawnCard = room.drawCard(playerId);
+    const drawnCard = this.gameEngine.drawCard(room, playerId);
     if (!drawnCard) {
       console.error(`User ${playerId} could not draw a card`);
       return;
     }
 
-    this.addToActionQueue(room.id, {
+    const drawAction = {
       turn: room.turn++,
       actionType: "drawCard",
       playerId: playerId,
       initiatorCard: drawnCard,
-    });
+    };
+    this.io.to(room.id).emit("actions", [drawAction]);
 
     return drawnCard;
   }
@@ -140,25 +136,24 @@ class SocketHandler {
       return;
     }
 
-    const playedCard = room.playCardToField(socket.user._id, userCard.cardId);
+    const playedCard = this.gameEngine.playCardToField(room, socket.user._id, userCard.cardId);
     if (!playedCard) {
       console.error(`User ${socket.user._id} could not play card ${userCard.cardId}`);
       return;
     }
 
-    this.addToActionQueue(room.id, {
+    const playAction = {
       turn: room.turn,
       actionType: "playCard",
       playerId: socket.user._id,
       initiatorCard: playedCard,
-    });
+    };
+    this.io.to(room.id).emit("actions", [playAction]);
 
     if (!room.isPvP) {
       const botDrawnCard = this.handleDrawCardRequest(socket, room.player2.id);
-      var botActionArray = this.botHandler.handleBotTurn(room);
-      botActionArray.forEach(botAction => {
-        this.addToActionQueue(room.id, botAction);
-      });
+      const botActionArray = this.botHandler.handleBotTurn(room);
+      this.io.to(room.id).emit("actions", botActionArray);
       this.handleDrawCardRequest(socket, socket.user._id);
     } else {
       this.handleDrawCardRequest(socket, room.getNextPlayerId(socket.user._id));
@@ -177,21 +172,6 @@ class SocketHandler {
     if ((room.isPvP && room.readyPlayers.length === 2) || (!room.isPvP && room.readyPlayers.length === 1)) {
       this.handleDrawCardRequest(socket, socket.user._id);
     }
-  }
-
-  addToActionQueue(roomId, action) {
-    if (!this.actionQueue[roomId]) {
-      this.actionQueue[roomId] = [];
-    }
-    this.actionQueue[roomId].push(action);
-
-    // Emit batched actions after a short delay
-    // setTimeout(() => {
-      if (this.actionQueue[roomId].length > 0) {
-        this.io.to(roomId).emit("actions", this.actionQueue[roomId]);
-        this.actionQueue[roomId] = [];
-      }
-    // }, 100); // Adjust the delay as needed
   }
 }
 
