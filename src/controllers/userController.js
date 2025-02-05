@@ -94,7 +94,6 @@ class UserController {
       res.status(404).send('User not found');
     } else {
       user.password = undefined;
-      console.log(user);
       res.status(200).json(user);
     }
   }
@@ -132,7 +131,6 @@ class UserController {
     try {
       let userData  = req.body;
       const newDeck = await DeckService.createDeck();
-      console.log(newDeck);
       const initUserData  = {
         rank         : -1,
         quote        : '',

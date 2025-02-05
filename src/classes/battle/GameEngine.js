@@ -1,8 +1,8 @@
-const Room = require('./Room');
+const Room = require('./BattleSession');
 
 class GameEngine {
   constructor() {
-    this.rooms = Room.rooms;
+    this.rooms = Room.sessionList;
   }
 
   attackCard(room, playerId, cardId) {

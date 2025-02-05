@@ -4,16 +4,24 @@
 /* Author: Ouadie ZERHOUNI
    Creation Date: 2024-01-28 01:21:48 */
 
-const Room = require('./models/Room'); // Adjust the path to your Room model file as needed
+const Room = require('../models/Room');
 
-// Create a new room and save it to the database
-async function createRoom(player1Id, player2Id) {
+// Create a new room with array of players
+/**
+ * 
+ * @param {*} playerIds 
+ * @returns {Room}
+ */
+async function createRoom(playerIds) {
+  // if (!Array.isArray(playerIds) || playerIds.length < 2) {
+  //   throw new Error('At least 2 players are required');
+  // }
+
   const room = new Room({
-    player1: player1Id,
-    player2: player2Id,
-    winner: 0, // Initialize with a draw
+    players: playerIds,
+    winner: -1, // Initialize with -1 for no winner
     start: new Date(),
-    duration: 0, // Initialize with 0 duration
+    duration: 0,
   });
 
   try {
@@ -24,21 +32,27 @@ async function createRoom(player1Id, player2Id) {
   }
 }
 
-// Update the room with the winner and duration
-async function updateRoom(roomId, winner, duration) {
+// Update room with winner index and duration
+async function updateRoom(roomId, winnerIndex, duration) {
   try {
+    const room = await Room.findById(roomId);
+    if (!room) {
+      throw new Error('Room not found');
+    }
+
+    // Validate winner index
+    if (winnerIndex !== -1 && (winnerIndex < 0 || winnerIndex >= room.players.length)) {
+      throw new Error('Invalid winner index');
+    }
+
     const updatedRoom = await Room.findByIdAndUpdate(
       roomId,
       {
-        winner,
+        winner: winnerIndex,
         duration,
       },
-      { new: true } // Return the updated room
+      { new: true }
     );
-
-    if (!updatedRoom) {
-      throw new Error('Room not found');
-    }
 
     return updatedRoom;
   } catch (error) {

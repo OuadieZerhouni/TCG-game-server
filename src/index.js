@@ -21,10 +21,10 @@ app.use(cors(corsOptions));
 
 const {checkJwt} = require('./middlewares/authMiddleware');
 // print any route that is called
-app.use((req, res, next) => {
-  console.log(`Route: ${req.url}`);
-  next();
-});
+// app.use((req, res, next) => {
+//   console.log(`Route: ${req.url}`);
+//   next();
+// });
 // Add the ability to parse JSON.
 app.use(express.json({ extended: false }));
 
@@ -38,7 +38,7 @@ const equipmentRelatedRoute = require('./routes/equipmentRelatedRoute');
 // const kingdomRoute       = require('./routes/kingdomRoute');
 const levelRoute            = require('./routes/levelRoute');
 // const profileRoute       = require('./routes/profileRoute');
-const roomRoute             = require('./routes/roomRoute');
+const battleRoute             = require('./routes/battleRoute');
 // const shopRoute          = require('./routes/shopRoute');
 const userRoute             = require('./routes/userRoute');
 const userCardRoute      = require('./routes/userCardRoute');
@@ -86,7 +86,7 @@ app.use('/api/decks', deckRoute); // Register the deck route.
 app.use('/api/equipments', equipmentRelatedRoute); // Register the equipment route.
 app.use('/api/levels', levelRoute); // Register the level route.
 // app.use('/api/profiles', profileRoute); // Register the profile route.
-app.use('/api/room', roomRoute); // Register the room route.
+app.use('/api/battleSession', battleRoute); // Register the room route.
 app.use('/api/user-cards', userCardRoute); // Register the user card route.
 
 // Register the other routes.

@@ -14,8 +14,6 @@ class DeckService {
   // deckService.updateDeckCards(user.deck._id, cardsToAdd, cardsToRemove)
   static async updateDeckCards(deckId, cardsToAdd, cardsToRemove) {
     try {
-      console.log(cardsToAdd);
-      console.log(cardsToRemove);
       const deck = await Deck.findById(deckId).exec();
       for (const card of cardsToAdd) {
         const userCard = await UserCard
@@ -51,7 +49,6 @@ class DeckService {
       const deck = await Deck.findById(deckId).exec();
       const userCard = await UserCard.findById(userCardId).exec();
       deck.totalPower += userCard.attack + userCard.blood;
-      console.log( userCard.attack);
       deck.cards.push(userCard._id);
       await deck.save();
     } catch (error) {

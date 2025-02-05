@@ -1,14 +1,15 @@
 const express = require('express');
 const router = express.Router();
 const levelService = require('../services/levelService');
-const Room = require('../classes/battle/Room');
+const roomService = require('../services/roomService');
+const BattleSession = require('../classes/battle/BattleSession');
 const { decodeToken } = require('../services/jwtServices');
 const UserService = require('../services/userService');
 const { v4: uuidv4 } = require('uuid');
 const DeckService = require('../services/deckService');
 
 /**
- * Creates a new room for the user to play a battle.
+ * Creates a new BattleSession for the user to play a battle.
  */
 router.post('/', async (req, res) => {
   try {
@@ -23,16 +24,17 @@ router.post('/', async (req, res) => {
       const level = await levelService.findLevelByStringId(req.body.level);
       const deck1 = player1.deck;
       const deck2 = level.deck;
-      const roomId = uuidv4();
-      const room = new Room(roomId, player1.id, level._id, 1, 0, new Date(), deck1, deck2, 2000, 2000, false);
-      res.status(201).json({ roomId, port: process.env.SOCKET_PORT });
-    } 
+      /** @type {Room} */
+      const room = await roomService.createRoom([player1.id]);
+      const battleSession = new BattleSession(room._id.toString(), player1.id, level._id, 1, 0, new Date(), deck1, deck2, 2000, 2000, false);
+      res.status(201).json({ battleSessionId: room._id.toString(), port: process.env.SOCKET_PORT });
+    }
     // else if (battleType === 'online') {
     //   const player2 = await UserService.findUserById(req.body.player2Id);
     //   const deck1 = await DeckService.findDeckById(player1.deck);
     //   const deck2 = await DeckService.findDeckById(player2.deck);
     //   const roomId = uuidv4();
-    //   const room = new Room(roomId, player1.id, player2.id, 1, 0, new Date(), deck1, deck2, 2000, 2000);
+    //   const room = new BattleSession(roomId, player1.id, player2.id, 1, 0, new Date(), deck1, deck2, 2000, 2000);
     //   res.status(201).json({ roomId });
     // }
   } catch (error) {

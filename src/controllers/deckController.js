@@ -19,9 +19,7 @@ class DeckController {
     try {
       const user = await userService.findUserById(req.user._id, true);
       const receivedDeckCards = req.body.cardIds;
-      console.log(receivedDeckCards);
       // receivedDeckCards.forEach((card) => {
-      //   console.log(user.userCards.map(card => card._id.toString()));
       //   if (user.userCards.map(card => card._id.toString()).includes(card)
       //   && !user.deck.cards.includes(card)) {
       //     deckService.addCardToDeck(user.deck._id, card);
@@ -42,8 +40,6 @@ class DeckController {
         }
       }
       cardsToRemove.push(...deckCards);
-      console.log(cardsToAdd);
-      console.log(cardsToRemove);
       deckService.updateDeckCards(user.deck._id, cardsToAdd, cardsToRemove);
     }
     catch (error) {

@@ -12,38 +12,31 @@ const mongoose = require('mongoose');
  */
 const roomSchema = new mongoose.Schema({
   /**
-   * The first player in the room.
-   *
-   * @property {mongoose.Types.ObjectId} player1
+   * Array of players in the room
+   * @property {Array<mongoose.Types.ObjectId>} players
    * @required
    */
-  player1: {
+  players: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: true,
-  },
+    required: true
+  }],
 
   /**
-   * The second player in the room.
-   *
-   * @property {mongoose.Types.ObjectId} player2
-   * @required
-   */
-  player2: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true,
-  },
-
-  /**
-   * The winner of the game. Use 0 for a draw.
-   *
+   * The index of winning player in players array. -1 for draw.
    * @property {Number} winner
    * @required
    */
   winner: {
     type: Number,
     required: true,
+    default: -1,
+    validate: {
+      validator: function(v) {
+        return v >= -1 && v < this.players.length;
+      },
+      message: 'Winner index must be valid player index or -1 for draw'
+    }
   },
 
   /**

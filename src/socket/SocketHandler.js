@@ -1,4 +1,5 @@
-const Room = require("../classes/battle/Room");
+const BattleSession = require("../classes/battle/BattleSession");
+// const BattleSession               = require("../classes/battle/BattleSession");
 const BotHandler = require("../classes/battle/BotHandler");
 const GameEngine = require("../classes/battle/GameEngine");
 const { checkJwtSocket } = require("../middlewares/authMiddleware");
@@ -18,7 +19,7 @@ class SocketHandler {
 
     this.io.on("connection", (socket) => {
       console.log(`User connected: ${socket.id}`);
-      socket.on("joinRoom", (roomId) => this.handleJoinRoom(socket, roomId));
+      socket.on("joinBattle", (roomId) => this.handleJoinBattle(socket, roomId));
       socket.on("playCardRequest", (userCard) => this.handlePlayCardToFieldRequest(socket, userCard));
       socket.on("readyForBattle", () => this.handleReadyForBattleRequest(socket));
       socket.on("disconnect", () => this.handleDisconnect(socket));
@@ -26,150 +27,199 @@ class SocketHandler {
     });
   }
 
-  handleJoinRoom(socket, roomId) {
-    if (!socket?.user?._id) {
-      socket.emit('error', { message: 'Invalid user session' });
-      return;
+  handleJoinBattle(socket, battleSessionId) {
+    try {
+      if (!socket?.user?._id) {
+        socket.emit('error', { message: 'Invalid user session' });
+        return;
+      }
+      /** @var {BattleSession} */
+      const battleSession = BattleSession.findBattleSessionById(battleSessionId);
+      if (!battleSession) {
+        socket.emit("roomNotFound", battleSessionId);
+        console.error(`BattleSession ${battleSessionId} not found for user ${socket.id}`);
+        return;
+      }
+      socket.join(battleSessionId);
+      console.log(`++++++++++++ User ${socket.id} joining room ${battleSessionId}`);
+
+      const gameData = {
+        deck1: battleSession.player1.deck.cards,
+        deck2: battleSession.player2.deck.cards,
+        initialData: true,
+        localPlayerId: socket.user._id,
+        OpponentId: (battleSession.player1.id === socket.user._id ? battleSession.player2.id : battleSession.player1.id).toString(),
+      };
+
+      socket.emit("initialAction", gameData);
     }
-
-    const room = Room.findRoomById(roomId);
-    if (!room) {
-      socket.emit("roomNotFound", roomId);
-      console.error(`Room ${roomId} not found for user ${socket.id}`);
-      return;
+    catch (err) {
+      console.error(err);
     }
-
-    socket.join(roomId);
-    console.log(`User ${socket.id} joining room ${roomId}`);
-
-    const gameData = {
-      deck1: room.player1.deck.cards,
-      deck2: room.player2.deck.cards,
-      drawnCard: null,
-      initialData: true,
-      localPlayerId: socket.user._id,
-      OpponentId: room.player1.id === socket.user._id ? room.player2.id : room.player1.id,
-    };
-
-    socket.emit("initialAction", gameData);
   }
 
   handleDisconnect(socket) {
     console.log(`User disconnected: ${socket.id}`);
-    const room = Room.findRoomByPlayerId(socket.user._id);
+    const room = BattleSession.findBattleSessionByPlayerId(socket.user._id);
     if (room) {
       room.readyPlayers = room.readyPlayers.filter((id) => id !== socket.user._id);
       if (room.readyPlayers.length === 0) {
-        Room.deleteRoomById(room.id);
+        BattleSession.deleteBattleSessionById(room.id);
       }
     }
   }
 
+  /**
+   * 
+   * @param {Socket} socket
+   * @param {Player} battleSession 
+   * @returns 
+   */
+  handleBattleEnd(socket, winner) {
+    // Determine winner based on blood points
+    if (!winner) return; // No winner yet
+
+    // Create battle end action
+    const battleEndAction = {
+      turn: battleSession.turn,
+      actionType: "battleEnd",
+      winnerId: winner,
+    };
+
+    // Emit battle end to all players in room
+    this.io.to(battleSession.id).emit("actions", [battleEndAction]);
+
+    // Save result to database
+    const duration = Date.now() - battleSession.startDate.getTime();
+    const winnerIndex = winner === battleSession.player1.id ? 0 : 1;
+
+    // Update room in database
+    const roomService = require('../services/roomService');
+    roomService.updateRoom(battleSession.id, winnerIndex, duration)
+      .catch(err => console.error('Failed to save battle result:', err));
+
+    // Clear room data
+    BattleSession.deleteBattleSessionById(battleSession.id);
+  }
+
   handleAttackCardRequest(socket, userCard) {
-    const room = Room.findRoomByPlayerId(socket.user._id);
-    if (!room) {
+    /** @type {BattleSession} */
+    const battleSession = BattleSession.findBattleSessionByPlayerId(socket.user._id);
+    if (!battleSession) {
       console.error(`User ${socket.user._id} is not in a room`);
       return;
     }
 
-    const [attackerCard, attackedCard] = this.gameEngine.attackCard(room, socket.user._id, userCard.cardId);
+    const [attackerCard, attackedCard] = this.gameEngine.attackCard(battleSession, socket.user._id, userCard.cardId);
     if (!attackedCard) {
       console.error(`User ${socket.user._id} could not attack card ${userCard.cardId}`);
       return;
     }
 
     const attackAction = {
-      turn: room.turn++,
+      turn: battleSession.turn++,
       actionType: "attackCard",
       playerId: socket.user._id,
       initiatorCard: attackerCard,
       targetCardList: [attackedCard],
     };
-    this.io.to(room.id).emit("actions", [attackAction]);
+    this.io.to(battleSession.id).emit("actions", [attackAction]);
 
     if (attackedCard.blood == 0) {
       const killAction = {
-        turn: room.turn,
+        turn: battleSession.turn,
         actionType: "killCard",
         playerId: socket.user._id,
         targetCardList: [attackedCard],
       };
-      this.io.to(room.id).emit("actions", [killAction]);
+      this.io.to(battleSession.id).emit("actions", [killAction]);
     }
 
-    if (!room.isPvP) {
-      const botDrawnCard = this.handleDrawCardRequest(socket, room.player2.id);
-      const botActionArray = this.botHandler.handleBotTurn(room);
-      this.io.to(room.id).emit("actions", botActionArray);
+    if (!battleSession.isPvP) {
+      const botDrawnCard = this.handleDrawCardRequest(socket, battleSession.player2.id);
+      const botActionArray = this.botHandler.handleBotTurn(battleSession);
+      this.io.to(battleSession.id).emit("actions", botActionArray);
+    }
+    // Check if battle should end after attack
+    if (battleSession.player1.isLost()) {
+      this.handleBattleEnd(socket, battleSession.player2);
+    }
+    else if (battleSession.player2.isLost()) {
+      this.handleBattleEnd(socket, battleSession.player1);
+    }
+    else {
       this.handleDrawCardRequest(socket, socket.user._id);
     }
   }
 
   handleDrawCardRequest(socket, playerId) {
-    const room = Room.findRoomByPlayerId(playerId);
-    if (!room) {
+    console.log(`User ${playerId} is drawing a card`);
+    /** @type {BattleSession} */
+    const battleSession = BattleSession.findBattleSessionByPlayerId(playerId);
+    if (!battleSession) {
       console.error(`User ${playerId} is not in a room`);
       return;
     }
 
-    const drawnCard = this.gameEngine.drawCard(room, playerId);
+    const drawnCard = this.gameEngine.drawCard(battleSession, playerId);
     if (!drawnCard) {
       console.error(`User ${playerId} could not draw a card`);
       return;
     }
 
     const drawAction = {
-      turn: room.turn++,
+      turn: battleSession.turn++,
       actionType: "drawCard",
       playerId: playerId,
       initiatorCard: drawnCard,
     };
-    this.io.to(room.id).emit("actions", [drawAction]);
+    //  log all io rooms and their clients
+    this.io.to(battleSession.id).emit("actions", [drawAction]);
 
     return drawnCard;
   }
 
   handlePlayCardToFieldRequest(socket, userCard) {
-    const room = Room.findRoomByPlayerId(socket.user._id);
-    if (!room) {
+    const battleSession = BattleSession.findBattleSessionByPlayerId(socket.user._id);
+    if (!battleSession) {
       console.error(`User ${socket.user._id} is not in a room`);
       return;
     }
 
-    const playedCard = this.gameEngine.playCardToField(room, socket.user._id, userCard.cardId);
+    const playedCard = this.gameEngine.playCardToField(battleSession, socket.user._id, userCard.cardId);
     if (!playedCard) {
       console.error(`User ${socket.user._id} could not play card ${userCard.cardId}`);
       return;
     }
 
     const playAction = {
-      turn: room.turn,
+      turn: battleSession.turn,
       actionType: "playCard",
       playerId: socket.user._id,
       initiatorCard: playedCard,
     };
-    this.io.to(room.id).emit("actions", [playAction]);
+    this.io.to(battleSession.id).emit("actions", [playAction]);
 
-    if (!room.isPvP) {
-      const botDrawnCard = this.handleDrawCardRequest(socket, room.player2.id);
-      const botActionArray = this.botHandler.handleBotTurn(room);
-      this.io.to(room.id).emit("actions", botActionArray);
+    if (!battleSession.isPvP) {
+      const botDrawnCard = this.handleDrawCardRequest(socket, battleSession.player2.id);
+      const botActionArray = this.botHandler.handleBotTurn(battleSession);
+      this.io.to(battleSession.id).emit("actions", botActionArray);
       this.handleDrawCardRequest(socket, socket.user._id);
     } else {
-      this.handleDrawCardRequest(socket, room.getNextPlayerId(socket.user._id));
+      this.handleDrawCardRequest(socket, battleSession.getNextPlayerId(socket.user._id));
     }
   }
 
   handleReadyForBattleRequest(socket) {
-    const room = Room.findRoomByPlayerId(socket.user._id);
-    if (!room) {
+    /** @type {BattleSession} */
+    const battleSession = BattleSession.findBattleSessionByPlayerId(socket.user._id);
+    if (!battleSession) {
       console.error(`User ${socket.user._id} is not in a room`);
       return;
     }
 
-    room.readyPlayers.push(socket.user._id);
-
-    if ((room.isPvP && room.readyPlayers.length === 2) || (!room.isPvP && room.readyPlayers.length === 1)) {
+    battleSession.readyPlayers.push(socket.user._id);
+    if ((battleSession.isPvP && battleSession.readyPlayers.length === 2) || (!battleSession.isPvP && battleSession.readyPlayers.length === 1)) {
       this.handleDrawCardRequest(socket, socket.user._id);
     }
   }

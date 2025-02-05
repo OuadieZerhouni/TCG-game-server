@@ -1,7 +1,7 @@
 const Player = require('./Player.js');
 
-class Room {
-  static rooms = [];
+class BattleSession {
+  static sessionList = [];
 
   constructor(id, player1Id, player2Id, turn, duration, startDate, deck1, deck2, blood1, blood2, isPvP = true) {
     this.id = id;
@@ -13,26 +13,25 @@ class Room {
     this.isPvP = isPvP;
     this.readyPlayers = [];
     this.currentTurnPlayerId = this.chooseFirstPlayer();
-    Room.rooms.push(this);
+    BattleSession.sessionList.push(this);
   }
 
   chooseFirstPlayer() {
     return Math.random() < 0.5 ? this.player1.id : this.player2.id;
   }
-
-  static findRoomById(id) {
-    return Room.rooms.find((room) => room.id === id) || null;
+  static findBattleSessionById(id) {
+    return BattleSession.sessionList.find((battleSession) => battleSession.id.toString() === id.toString()) || null;
   }
 
-  static deleteRoomById(id) {
-    Room.rooms = Room.rooms.filter((room) => room.id !== id);
+  static deleteBattleSessionById(id) {
+    BattleSession.sessionList = BattleSession.sessionList.filter((battleSession) => battleSession.id !== id);
   }
 
-  static findRoomByPlayerId(playerId) {
-    return Room.rooms.find(
-      (room) => room.player1.id === playerId || room.player2.id === playerId
+  static findBattleSessionByPlayerId(playerId) {
+    return BattleSession.sessionList.find(
+      (battleSession) => battleSession.player1.id === playerId || battleSession.player2.id === playerId
     ) || null;
   }
 }
 
-module.exports = Room;
+module.exports = BattleSession;

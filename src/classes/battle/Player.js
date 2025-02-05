@@ -56,7 +56,6 @@ class Player {
   }
 
   getCardIndexOnField(cardId) {
-    console.log(this.field);
     return this.field.findIndex((card) => card.id === cardId
     );
   }
@@ -111,6 +110,10 @@ class Player {
     return card;
   }
 
+  isLost() {
+    return !this.deck.cards.length && !this.hand.length && !this.field.length;
+  }
+
   /**
    * Draws a card from the deck to the hand.
    * @returns {Card|null} - The drawn card or null if deck is empty.
@@ -122,7 +125,6 @@ class Player {
     }
     const card = this.deck.cards.shift();
     this.hand.push(card);
-    console.log(`Player ${this.id} drew card ${card.id}`);
     return card;
   }
 }
