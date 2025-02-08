@@ -1,8 +1,10 @@
 const BattleSession = require("../classes/battle/BattleSession");
-// const BattleSession               = require("../classes/battle/BattleSession");
+// const BattleSession   = require("../classes/battle/BattleSession");
 const BotHandler = require("../classes/battle/BotHandler");
+const Player = require("../classes/battle/Player");
 const GameEngine = require("../classes/battle/GameEngine");
 const { checkJwtSocket } = require("../middlewares/authMiddleware");
+const roomService = require('../services/roomService');
 
 class SocketHandler {
   constructor(io) {
@@ -60,30 +62,30 @@ class SocketHandler {
 
   handleDisconnect(socket) {
     console.log(`User disconnected: ${socket.id}`);
-    const room = BattleSession.findBattleSessionByPlayerId(socket.user._id);
-    if (room) {
-      room.readyPlayers = room.readyPlayers.filter((id) => id !== socket.user._id);
-      if (room.readyPlayers.length === 0) {
-        BattleSession.deleteBattleSessionById(room.id);
+    const battleSession = BattleSession.findBattleSessionByPlayerId(socket.user._id);
+    if (battleSession) {
+      battleSession.readyPlayers = battleSession.readyPlayers.filter((id) => id !== socket.user._id);
+      if (battleSession.readyPlayers.length === 0) {
+        BattleSession.deleteBattleSessionById(battleSession.id);
       }
     }
   }
-
   /**
-   * 
-   * @param {Socket} socket
-   * @param {Player} battleSession 
-   * @returns 
-   */
-  handleBattleEnd(socket, winner) {
+     *
+     * @param {Socket} socket
+     * @param {Player} winner
+     * @param {BattleSession} battleSession
+     * @returns
+     */
+  handleGameOver(socket, winner, battleSession) {
     // Determine winner based on blood points
     if (!winner) return; // No winner yet
 
     // Create battle end action
     const battleEndAction = {
       turn: battleSession.turn,
-      actionType: "battleEnd",
-      winnerId: winner,
+      actionType: "gameOver",
+      playerId: winner.id,
     };
 
     // Emit battle end to all players in room
@@ -91,17 +93,16 @@ class SocketHandler {
 
     // Save result to database
     const duration = Date.now() - battleSession.startDate.getTime();
-    const winnerIndex = winner === battleSession.player1.id ? 0 : 1;
+    const winnerId = winner.id; // Get the winner's ID
+    const winnerModel = winner.constructor.name; // Get the winner's model name ("Player" or "Bot")
 
     // Update room in database
-    const roomService = require('../services/roomService');
-    roomService.updateRoom(battleSession.id, winnerIndex, duration)
+    roomService.updateRoom(battleSession.id, winnerId, winnerModel, duration)
       .catch(err => console.error('Failed to save battle result:', err));
 
     // Clear room data
     BattleSession.deleteBattleSessionById(battleSession.id);
   }
-
   handleAttackCardRequest(socket, userCard) {
     /** @type {BattleSession} */
     const battleSession = BattleSession.findBattleSessionByPlayerId(socket.user._id);
@@ -142,10 +143,10 @@ class SocketHandler {
     }
     // Check if battle should end after attack
     if (battleSession.player1.isLost()) {
-      this.handleBattleEnd(socket, battleSession.player2);
+      this.handleGameOver(socket, battleSession.player2, battleSession);
     }
     else if (battleSession.player2.isLost()) {
-      this.handleBattleEnd(socket, battleSession.player1);
+      this.handleGameOver(socket, battleSession.player1, battleSession);
     }
     else {
       this.handleDrawCardRequest(socket, socket.user._id);

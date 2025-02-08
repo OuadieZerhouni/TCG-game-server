@@ -1,9 +1,3 @@
-/* Author: Ouadie ZERHOUNI
-   Creation Date: 2024-01-28 01:22:08 */
-
-/* Author: Ouadie ZERHOUNI
-   Creation Date: 2024-01-28 01:21:48 */
-
 const Room = require('../models/Room');
 
 // Create a new room with array of players
@@ -19,7 +13,7 @@ async function createRoom(playerIds) {
 
   const room = new Room({
     players: playerIds,
-    winner: -1, // Initialize with -1 for no winner
+    winner: null, // Initialize with null for no winner
     start: new Date(),
     duration: 0,
   });
@@ -32,23 +26,19 @@ async function createRoom(playerIds) {
   }
 }
 
-// Update room with winner index and duration
-async function updateRoom(roomId, winnerIndex, duration) {
+// Update room with winner and duration
+async function updateRoom(roomId, winnerId, winnerModel, duration) {
   try {
     const room = await Room.findById(roomId);
     if (!room) {
       throw new Error('Room not found');
     }
 
-    // Validate winner index
-    if (winnerIndex !== -1 && (winnerIndex < 0 || winnerIndex >= room.players.length)) {
-      throw new Error('Invalid winner index');
-    }
-
     const updatedRoom = await Room.findByIdAndUpdate(
       roomId,
       {
-        winner: winnerIndex,
+        winner: winnerId,
+        winnerModel: winnerModel,
         duration,
       },
       { new: true }

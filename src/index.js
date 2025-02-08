@@ -29,20 +29,14 @@ const {checkJwt} = require('./middlewares/authMiddleware');
 app.use(express.json({ extended: false }));
 
 // Import the routes.
-const abilityRoute          = require('./routes/abilityRoute');
-const cardRoute             = require('./routes/cardRoute');
-const deckRoute          = require('./routes/deckRoute');
-// const deckRelatedRoute      = require('./routes/deckRelatedRoute');
-const equipmentRelatedRoute = require('./routes/equipmentRelatedRoute');
-// const equipmentRoute     = require('./routes/equipmentRoute');
-// const kingdomRoute       = require('./routes/kingdomRoute');
-const levelRoute            = require('./routes/levelRoute');
-// const profileRoute       = require('./routes/profileRoute');
+const abilityRoute            = require('./routes/abilityRoute');
+const cardRoute               = require('./routes/cardRoute');
+const deckRoute               = require('./routes/deckRoute');
+const equipmentRelatedRoute   = require('./routes/equipmentRelatedRoute');
+const levelRoute              = require('./routes/levelRoute');
 const battleRoute             = require('./routes/battleRoute');
-// const shopRoute          = require('./routes/shopRoute');
-const userRoute             = require('./routes/userRoute');
-const userCardRoute      = require('./routes/userCardRoute');
-// const userCardRelatedRoute  = require('./routes/userCardRelatedRoute');
+const userRoute               = require('./routes/userRoute');
+const userCardRoute           = require('./routes/userCardRoute');
 
 
 app.use('/api/users', userRoute); // Register the user route.
