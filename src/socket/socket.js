@@ -16,7 +16,7 @@ socketHandler.initializeSocketEvents();
 
 const SOCKET_PORT = process.env.SOCKET_PORT;
 server.listen(SOCKET_PORT, () => {
-    console.log(`Server listening on port ${SOCKET_PORT}`);
+    console.log(`Socket open on port ${SOCKET_PORT}`);
 });
 
 module.exports = server;

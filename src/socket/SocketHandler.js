@@ -102,7 +102,10 @@ class SocketHandler {
 
     // Clear room data
     BattleSession.deleteBattleSessionById(battleSession.id);
+    this.io.in(battleSession.id).socketsLeave(battleSession.id);
+
   }
+
   handleAttackCardRequest(socket, userCard) {
     /** @type {BattleSession} */
     const battleSession = BattleSession.findBattleSessionByPlayerId(socket.user._id);
@@ -161,6 +164,7 @@ class SocketHandler {
       console.error(`User ${playerId} is not in a room`);
       return;
     }
+    console.log(`User ${playerId} is drawing a card in room ${battleSession.id}`);
 
     const drawnCard = this.gameEngine.drawCard(battleSession, playerId);
     if (!drawnCard) {
@@ -174,6 +178,7 @@ class SocketHandler {
       playerId: playerId,
       initiatorCard: drawnCard,
     };
+    console.log(`Emitting draw action to room ${battleSession.id}`);
     //  log all io rooms and their clients
     this.io.to(battleSession.id).emit("actions", [drawAction]);
 
@@ -218,8 +223,12 @@ class SocketHandler {
       console.error(`User ${socket.user._id} is not in a room`);
       return;
     }
+    console.log(`User ${socket.user._id} is ready for battle`);
 
     battleSession.readyPlayers.push(socket.user._id);
+    console.log(`Battle session ${battleSession.id} ready players: ${battleSession.readyPlayers.length}/${battleSession.isPvP ? 2 : 1}`);
+    console.log(`Battle session ${battleSession.id} is PvP: ${battleSession.isPvP}`);
+    console.log(`Battle session ${battleSession.id} ready players list: ${battleSession.readyPlayers}`);
     if ((battleSession.isPvP && battleSession.readyPlayers.length === 2) || (!battleSession.isPvP && battleSession.readyPlayers.length === 1)) {
       this.handleDrawCardRequest(socket, socket.user._id);
     }

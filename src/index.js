@@ -38,7 +38,6 @@ const battleRoute             = require('./routes/battleRoute');
 const userRoute               = require('./routes/userRoute');
 const userCardRoute           = require('./routes/userCardRoute');
 
-
 app.use('/api/users', userRoute); // Register the user route.
 app.use('/api/cards', cardRoute); // Register the card route.
 
@@ -63,7 +62,6 @@ app.post('/api/admin/login', (req, res) => {
     res.status(401).send("Unauthorized");
   }
 });
-
 
 app.get('/api/minVersion', (req, res) => {
 // app.use('/', kingdomRoute);

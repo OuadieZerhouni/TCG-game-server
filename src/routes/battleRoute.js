@@ -27,7 +27,7 @@ router.post('/', async (req, res) => {
       /** @type {Room} */
       const room = await roomService.createRoom([player1.id]);
       const battleSession = new BattleSession(room._id.toString(), player1.id, level._id, 1, 0, new Date(), deck1, deck2, 2000, 2000, false);
-      res.status(201).json({ battleSessionId: room._id.toString(), port: process.env.SOCKET_PORT });
+      res.status(201).json({ battleSessionId: room._id.toString() });
     }
     // else if (battleType === 'online') {
     //   const player2 = await UserService.findUserById(req.body.player2Id);

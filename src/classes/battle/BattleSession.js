@@ -14,13 +14,15 @@ class BattleSession {
     this.readyPlayers = [];
     this.currentTurnPlayerId = this.chooseFirstPlayer();
     BattleSession.sessionList.push(this);
+    console.log('BattleSession.sessionList');
+    console.log(BattleSession.sessionList);
   }
 
   chooseFirstPlayer() {
     return Math.random() < 0.5 ? this.player1.id : this.player2.id;
   }
-  static findBattleSessionById(id) {
-    return BattleSession.sessionList.find((battleSession) => battleSession.id.toString() === id.toString()) || null;
+  static findBattleSessionById(sessionid) {
+    return BattleSession.sessionList.find((battleSession) => battleSession.id.toString() === sessionid.toString()) || null;
   }
 
   static deleteBattleSessionById(id) {
