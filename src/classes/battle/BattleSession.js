@@ -14,8 +14,6 @@ class BattleSession {
     this.readyPlayers = [];
     this.currentTurnPlayerId = this.chooseFirstPlayer();
     BattleSession.sessionList.push(this);
-    console.log('BattleSession.sessionList');
-    console.log(BattleSession.sessionList);
   }
 
   chooseFirstPlayer() {

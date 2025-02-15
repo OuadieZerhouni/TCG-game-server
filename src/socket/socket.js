@@ -1,7 +1,6 @@
 const https = require('http');
 const socketIo = require('socket.io');
-const SocketHandler = require('./SocketHandler');
-const fs = require('fs');
+const SocketHandler = require('../classes/network/SocketHandler');
 
 const server = https.createServer(
 //     {
