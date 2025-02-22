@@ -32,6 +32,10 @@ class BattleSession {
       (battleSession) => battleSession.player1.id === playerId || battleSession.player2.id === playerId
     ) || null;
   }
+
+  nextPlayerTurn() {
+    this.currentTurnPlayerId = this.currentTurnPlayerId === this.player1.id ? this.player2.id : this.player1.id;
+  }
 }
 
 module.exports = BattleSession;

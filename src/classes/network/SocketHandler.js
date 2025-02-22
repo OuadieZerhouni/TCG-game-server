@@ -6,15 +6,31 @@ const { checkJwtSocket } = require("../../middlewares/authMiddleware");
 const roomService = require('../../services/roomService');
 const ActionEmitter = require('./ActionEmitter');
 const BattleSessionManager = require('../battle/BattleSessionManager');
+const CommandFactory = require('../battle/command/CommandFactory');
+const { isObject } = require("util");
 
+/**
+ * Handles socket events.
+ * @class
+    */
 class SocketHandler {
-    constructor(io) {
+    /**
+     * 
+     * @param {socketIo} io
+     * @param {GameEngine} gameEngine
+     * @param {ActionEmitter} actionEmitter
+     * @param {RoomService} roomService
+     */
+    constructor(
+        io,
+        gameEngine,
+    ) {
         this.io = io;
-        this.botHandler = new BotHandler(io);
-        this.gameEngine = new GameEngine();
+        this.gameEngine = gameEngine;
         this.actionEmitter = new ActionEmitter(io);
-        this.rooms = {};
-        this.disconnectTimers = new Map(); // Track disconnect timers for auto-surrender
+        this.botHandler = new BotHandler(io);
+        this.disconnectTimers = new Map();
+        this.commandFactory = new CommandFactory(this);
     }
 
     initializeSocketEvents() {
@@ -24,15 +40,21 @@ class SocketHandler {
 
         this.io.on("connection", (socket) => {
             console.log(`User connected: ${socket.id}`);
-            socket.on("joinBattle", (roomId) => this.handleJoinBattle(socket, roomId));
-            socket.on("playCardRequest", (userCard) => this.handlePlayCardToFieldRequest(socket, userCard));
-            socket.on("readyForBattle", () => this.handleReadyForBattleRequest(socket));
-            socket.on("disconnect", () => {
-                this.handleDisconnect(socket);
-                this.handleLeaveRequest(socket, socket.user._id);
+            socket.on("joinBattle", (roomId) => {
+                const command = this.commandFactory.createCommand('JoinBattle', socket, roomId);
+                command.execute();
             });
-            socket.on("attackCardRequest", (userCard) => this.handleAttackCardRequest(socket, userCard));
-            socket.on("surrenderRequest", () => this.handleSurrenderRequest(socket, socket.user._id));
+            socket.on("playCardRequest", (userCard) => {
+                const command = this.commandFactory.createCommand('PlayCard', socket, userCard);
+                command.execute();
+            });
+            socket.on("readyForBattle", () => this.#handleReadyForBattleRequest(socket));
+            socket.on("disconnect", () => {
+                this.#handleDisconnect(socket);
+                this.#handleLeaveRequest(socket, socket.user._id);
+            });
+            socket.on("attackCardRequest", (userCard) => this.#handleAttackCardRequest(socket, userCard));
+            socket.on("surrenderRequest", () => this.#handleSurrenderRequest(socket, socket.user._id));
         });
     }
 
@@ -41,13 +63,13 @@ class SocketHandler {
      * @param {Socket} socket - The socket object of the user.
      * @param {string} battleSessionId - The ID of the battle session to join.
      */
-    handleJoinBattle(socket, battleSessionId) {
+    #handleJoinBattle(socket, battleSessionId) {
         try {
             if (!this.validateUserSession(socket)) return;
 
             const battleSession = BattleSessionManager.findBattleSessionById(battleSessionId);
             if (!battleSession) {
-                this.handleRoomNotFound(socket, battleSessionId);
+                this.#handleRoomNotFound(socket, battleSessionId);
                 return;
             }
 
@@ -65,7 +87,7 @@ class SocketHandler {
      * Handles user disconnection.
      * @param {Socket} socket - The socket object of the disconnected user.
      */
-    handleDisconnect(socket) {
+    #handleDisconnect(socket) {
         console.log(`User disconnected: ${socket.id}`);
         const userId = socket.user._id;
         const battleSession = BattleSessionManager.findBattleSessionByPlayerId(userId);
@@ -81,7 +103,7 @@ class SocketHandler {
      * @param {Player} winner - The winning player.
      * @param {BattleSession} battleSession - The battle session that ended.
      */
-    handleGameOver(winner, battleSession) {
+    #handleGameOver(winner, battleSession) {
         if (!winner) return; // No winner yet
 
         this.actionEmitter.emitBattleEndAction(battleSession, winner.id);
@@ -94,7 +116,7 @@ class SocketHandler {
      * @param {Socket} socket - The socket object of the user.
      * @param {object} userCard - The card used for the attack.
      */
-    handleAttackCardRequest(socket, userCard) {
+    #handleAttackCardRequest(socket, userCard) {
         const battleSession = BattleSessionManager.findBattleSessionByPlayerId(socket.user._id);
         if (!battleSession) {
             console.error(`User ${socket.user._id} is not in a room`);
@@ -112,8 +134,7 @@ class SocketHandler {
         if (!battleSession.isPvP) {
             this.handleBotTurn(socket, battleSession);
         }
-
-        this.checkAndHandleGameOver(socket, battleSession);
+        this.#checkAndHandleGameOver(socket, battleSession);
     }
 
     /**
@@ -134,10 +155,12 @@ class SocketHandler {
         const drawnCard = this.gameEngine.drawCard(battleSession, playerId);
         if (!drawnCard) {
             console.error(`User ${playerId} could not draw a card`);
+            this.actionEmitter.emitNextTurnAction(battleSession);
             return;
         }
-
+        this.actionEmitter.emitNextTurnAction(battleSession);
         this.actionEmitter.emitDrawAction(socket, battleSession, playerId, drawnCard);
+
         return drawnCard;
     }
 
@@ -146,7 +169,7 @@ class SocketHandler {
      * @param {Socket} socket - The socket object of the user.
      * @param {object} userCard - The card to be played.
      */
-    handlePlayCardToFieldRequest(socket, userCard) {
+    #handlePlayCardToFieldRequest(socket, userCard) {
         const battleSession = BattleSessionManager.findBattleSessionByPlayerId(socket.user._id);
         if (!battleSession) {
             console.error(`User ${socket.user._id} is not in a room`);
@@ -173,7 +196,7 @@ class SocketHandler {
      * Handles a ready for battle request from a user.
      * @param {Socket} socket - The socket object of the user.
      */
-    handleReadyForBattleRequest(socket) {
+    #handleReadyForBattleRequest(socket) {
         const battleSession = BattleSessionManager.findBattleSessionByPlayerId(socket.user._id);
         if (!battleSession) {
             console.error(`User ${socket.user._id} is not in a room`);
@@ -195,7 +218,7 @@ class SocketHandler {
      * @param {Socket} socket - The socket object of the user.
      * @param {string} userId - The ID of the user who surrendered.
      */
-    handleSurrenderRequest(socket, userId) {
+    #handleSurrenderRequest(socket, userId) {
         const battleSession = BattleSessionManager.findBattleSessionByPlayerId(userId);
         if (!battleSession) {
             console.error(`User ${userId} is not in any battle session`);
@@ -206,7 +229,7 @@ class SocketHandler {
 
         console.log(`User ${userId} surrendered.`);
         this.actionEmitter.emitSurrenderAction(battleSession, userId);
-        this.handleGameOver(winner, battleSession);
+        this.#handleGameOver(winner, battleSession);
     }
 
     /**
@@ -214,7 +237,7 @@ class SocketHandler {
      * @param {Socket} socket - The socket object of the user.
      * @param {string} userId - The ID of the user who surrendered.
      */
-    handleLeaveRequest(socket, userId) {
+    #handleLeaveRequest(socket, userId) {
         const battleSession = BattleSessionManager.findBattleSessionByPlayerId(userId);
         if (!battleSession) {
             console.error(`User ${userId} is not in any battle session`);
@@ -225,7 +248,7 @@ class SocketHandler {
 
         console.log(`User ${userId} left.`);
         // Don't emit the surrender action to all players in the battle room
-        this.handleGameOver(winner, battleSession);
+        this.#handleGameOver(winner, battleSession);
     }
 
     /**
@@ -248,7 +271,7 @@ class SocketHandler {
      * @param {Socket} socket - The socket object of the user.
      * @param {string} battleSessionId - The ID of the battle session that was not found.
      */
-    handleRoomNotFound(socket, battleSessionId) {
+    #handleRoomNotFound(socket, battleSessionId) {
         socket.emit("roomNotFound", battleSessionId);
         console.error(`BattleSession ${battleSessionId} not found for user ${socket.id}`);
     }
@@ -262,7 +285,6 @@ class SocketHandler {
         if (this.disconnectTimers.has(userId)) {
             clearTimeout(this.disconnectTimers.get(userId));
             this.disconnectTimers.delete(userId);
-            console.log(`Cleared auto-surrender timer for user ${userId}`);
         }
     }
 
@@ -273,14 +295,12 @@ class SocketHandler {
      * @param {string} userId - The ID of the user.
      */
     setAutoSurrenderTimer(socket, userId) {
-        if (!this.disconnectTimers.has(userId)) {
-            const timeoutId = setTimeout(() => {
-                console.log(`User ${userId} timed out. Automatically surrendering.`);
-                this.handleSurrenderRequest(socket, userId);
-                this.disconnectTimers.delete(userId);
-            }, 20 * 1000);
-            this.disconnectTimers.set(userId, timeoutId);
-        }
+        const timer = setTimeout(() => {
+            console.log(`User ${userId} auto-surrendered due to disconnection.`);
+            this.#handleSurrenderRequest(socket, userId);
+        }, 30000); // 30 seconds
+
+        this.disconnectTimers.set(userId, timer);
     }
 
     /**
@@ -326,11 +346,11 @@ class SocketHandler {
      * @param {Socket} socket - The socket object of the user.
      * @param {BattleSession} battleSession - The battle session object.
      */
-    checkAndHandleGameOver(socket, battleSession) {
+    #checkAndHandleGameOver(socket, battleSession) {
         if (battleSession.player1.isLost()) {
-            this.handleGameOver(battleSession.player2, battleSession);
+            this.#handleGameOver(battleSession.player2, battleSession);
         } else if (battleSession.player2.isLost()) {
-            this.handleGameOver(battleSession.player1, battleSession);
+            this.#handleGameOver(battleSession.player1, battleSession);
         } else {
             this.handleDrawCardRequest(socket, socket.user._id);
         }

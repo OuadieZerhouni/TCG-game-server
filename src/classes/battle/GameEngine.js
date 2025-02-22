@@ -1,45 +1,41 @@
-const Room = require('./BattleSession');
+const BattleSession = require('./BattleSession');
 
 class GameEngine {
   constructor() {
-    this.rooms = Room.sessionList;
+    this.battleSessions = BattleSession.sessionList;
   }
 
-  attackCard(room, playerId, cardId) {
-    const [attackerPlayer, attackedPlayer] = room.player1.id === playerId ? [room.player1, room.player2] : [room.player2, room.player1];
+  attackCard(battleSession, playerId, cardId) {
+    const [attackerPlayer, attackedPlayer] = battleSession.player1.id === playerId
+      ? [battleSession.player1, battleSession.player2]
+      : [battleSession.player2, battleSession.player1];
     const attackerCard = attackerPlayer.field.filter((card) => card.id === cardId)[0];
     if (!attackerCard) {
       console.error(`Player ${playerId} could not find card ${cardId} to attack`);
       return null;
     }
+    // Instead of ending the turn inside GameEngine, we let ActionEmitter handle it
     const attackedCard = attackedPlayer.takeAttack(attackerCard.attack, attackerPlayer.getCardIndexOnField(cardId));
+    // Removed: this.nextPlayerTurn(battleSession);
     return [attackerCard, attackedCard];
   }
 
-  playCardToField(room, playerId, cardId) {
-    const player = room.player1.id === playerId ? room.player1 : room.player2;
+  playCardToField(battleSession, playerId, cardId) {
+    const player = battleSession.player1.id === playerId ? battleSession.player1 : battleSession.player2;
     const playedCard = player.playCardToField(cardId);
     if (playedCard) {
-      this.endTurn(room);
+      // Removed: this.nextPlayerTurn(battleSession);
     }
     return playedCard;
   }
 
-  drawCard(room, playerId) {
-    const player = room.player1.id === playerId ? room.player1 : room.player2;
+  drawCard(battleSession, playerId) {
+    const player = battleSession.player1.id === playerId ? battleSession.player1 : battleSession.player2;
     return player.drawCard();
   }
 
-  endTurn(room) {
-    room.currentTurnPlayerId = room.currentTurnPlayerId === room.player1.id ? room.player2.id : room.player1.id;
-  }
-
-  getCurrentPlayerId(room) {
-    return room.currentTurnPlayerId;
-  }
-
-  isBotTurn(room) {
-    return !room.isPvP && room.currentTurnPlayerId === room.player2.id;
+  isBotTurn(battleSession) {
+    return !battleSession.isPvP && battleSession.currentTurnPlayerId === battleSession.player2.id;
   }
 }
 

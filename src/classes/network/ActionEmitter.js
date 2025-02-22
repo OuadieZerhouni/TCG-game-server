@@ -67,7 +67,11 @@ class ActionEmitter {
         };
         this.io.to(battleSession.id).emit("actions", [playAction]);
     }
-
+    /**
+     * 
+     * @param {BattleSession} battleSession 
+     * @param {int} userId 
+     */
     emitSurrenderAction(battleSession, userId) {
         const surrenderAction = {
             turn: battleSession.turn,
@@ -75,6 +79,21 @@ class ActionEmitter {
             playerId: userId,
         };
         this.io.to(battleSession.id).emit("actions", [surrenderAction]);
+    }
+
+    /**
+     * 
+     * @param {BattleSession} battleSession
+     */
+    emitNextTurnAction(battleSession) {
+        battleSession.turn++;
+        battleSession.nextPlayerTurn();
+        const nextTurnAction = {
+            turn: battleSession.turn,
+            actionType: "nextTurn",
+            playerId: battleSession.currentTurnPlayerId, // using the current turn player's id
+        };
+        this.io.to(battleSession.id).emit("actions", [nextTurnAction]);
     }
 }
 

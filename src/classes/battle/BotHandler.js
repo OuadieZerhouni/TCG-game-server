@@ -6,23 +6,23 @@ class BotHandler {
     this.gameEngine = new GameEngine();
   }
 
-  handleBotTurn(room) {
-    const bot = room.player2;
+  handleBotTurn(battleSession) {
+    const bot = battleSession.player2;
 
     if (bot.hand.length > 0) {
-      const playedCard = this.gameEngine.playCardToField(room, bot.id, bot.hand[0].id);
+      const playedCard = this.gameEngine.playCardToField(battleSession, bot.id, bot.hand[0].id);
       if (playedCard) {
         return [{
-          turn: room.turn++,
+          turn: battleSession.turn++,
           actionType: "playCard",
           playerId: bot.id,
           initiatorCard: playedCard,
         }];
       }
     } else if (bot.field.length > 0) {
-      const [attackerCard, attackedCard] = this.gameEngine.attackCard(room, bot.id, bot.field[0].id);
+      const [attackerCard, attackedCard] = this.gameEngine.attackCard(battleSession, bot.id, bot.field[0].id);
       const result = [{
-        turn: room.turn++,
+        turn: battleSession.turn++,
         actionType: "attackCard",
         playerId: bot.id,
         initiatorCard: attackerCard,
@@ -30,7 +30,7 @@ class BotHandler {
       }];
       if (attackedCard.blood == 0) {
         result.push({
-          turn: room.turn,
+          turn: battleSession.turn,
           actionType: "killCard",
           playerId: bot.id,
           targetCardList: [attackedCard],
