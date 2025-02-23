@@ -11,7 +11,7 @@ const server = https.createServer(
 );
 const io = socketIo(server);
 
-const socketHandler = new SocketHandler(io, new GameEngine(), );
+const socketHandler = new SocketHandler(io );
 socketHandler.initializeSocketEvents();
 
 const SOCKET_PORT = process.env.SOCKET_PORT;

@@ -1,12 +1,13 @@
 const BattleSessionManager = require('../BattleSessionManager');
 const ICommand = require('./ICommand');
+const GameEngine = require('../GameEngine');
 
 class PlayCardCommand extends ICommand {
-    constructor(socketHandler, socket, userCard) {
+    constructor(socketHandler, payload) {
         super();
         this.socketHandler = socketHandler;
-        this.socket = socket;
-        this.userCard = userCard;
+        this.socket = payload.socket;
+        this.userCard = payload.userCard;
     }
 
     execute() {
@@ -16,7 +17,7 @@ class PlayCardCommand extends ICommand {
             return;
         }
 
-        const playedCard = this.socketHandler.gameEngine.playCardToField(
+        const playedCard = GameEngine.playCardToField(
             battleSession, 
             this.socket.user._id, 
             this.userCard.cardId

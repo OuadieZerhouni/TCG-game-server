@@ -7,26 +7,16 @@ const roomService = require('../../services/roomService');
 const ActionEmitter = require('./ActionEmitter');
 const BattleSessionManager = require('../battle/BattleSessionManager');
 const CommandFactory = require('../battle/command/CommandFactory');
-const { isObject } = require("util");
 
 /**
  * Handles socket events.
  * @class
-    */
+ */
 class SocketHandler {
-    /**
-     * 
-     * @param {socketIo} io
-     * @param {GameEngine} gameEngine
-     * @param {ActionEmitter} actionEmitter
-     * @param {RoomService} roomService
-     */
     constructor(
-        io,
-        gameEngine,
+        io
     ) {
         this.io = io;
-        this.gameEngine = gameEngine;
         this.actionEmitter = new ActionEmitter(io);
         this.botHandler = new BotHandler(io);
         this.disconnectTimers = new Map();
@@ -40,46 +30,47 @@ class SocketHandler {
 
         this.io.on("connection", (socket) => {
             console.log(`User connected: ${socket.id}`);
+
             socket.on("joinBattle", (roomId) => {
-                const command = this.commandFactory.createCommand('JoinBattle', socket, roomId);
-                command.execute();
+                this.#executeCommand('JoinBattle', { socket: socket, roomId: roomId });
             });
+
             socket.on("playCardRequest", (userCard) => {
-                const command = this.commandFactory.createCommand('PlayCard', socket, userCard);
-                command.execute();
+                this.#executeCommand('PlayCard', { socket: socket, userCard: userCard });
             });
+
+            socket.on("drawCardRequest", () => {
+                this.#executeCommand('DrawCard', { socket: socket });
+            });
+            
+            socket.on("attackCardRequest", (attackData) => {
+                this.#executeCommand('Attack', { socket: socket, attackData: attackData });
+            });
+
             socket.on("readyForBattle", () => this.#handleReadyForBattleRequest(socket));
+
             socket.on("disconnect", () => {
                 this.#handleDisconnect(socket);
                 this.#handleLeaveRequest(socket, socket.user._id);
             });
-            socket.on("attackCardRequest", (userCard) => this.#handleAttackCardRequest(socket, userCard));
+
             socket.on("surrenderRequest", () => this.#handleSurrenderRequest(socket, socket.user._id));
         });
     }
 
     /**
-     * Joins a user to a battle session.
-     * @param {Socket} socket - The socket object of the user.
-     * @param {string} battleSessionId - The ID of the battle session to join.
+     * Executes a command using the CommandFactory.
+     * @param {string} commandName - The name of the command to execute.
+     * @param {object} payload - The payload to pass to the command.
      */
-    #handleJoinBattle(socket, battleSessionId) {
+    #executeCommand(commandName, payload) {
         try {
-            if (!this.validateUserSession(socket)) return;
-
-            const battleSession = BattleSessionManager.findBattleSessionById(battleSessionId);
-            if (!battleSession) {
-                this.#handleRoomNotFound(socket, battleSessionId);
-                return;
-            }
-
-            socket.join(battleSessionId);
-            console.log(`++++++++++++ User ${socket.id} joining room ${battleSessionId}`);
-
-            this.actionEmitter.emitInitialGameData(socket, battleSession);
-            this.clearAutoSurrenderTimer(socket.user._id);
-        } catch (err) {
-            console.error(err);
+            const command = this.commandFactory.createCommand(commandName, payload);
+            command.execute();
+        } catch (error) {
+            console.error(`Error executing command ${commandName}:`, error);
+            // Optionally emit an error event to the client
+            payload.socket.emit('commandFailed', { command: commandName, error: error.message });
         }
     }
 
@@ -112,32 +103,6 @@ class SocketHandler {
     }
 
     /**
-     * Handles a card attack request from a user.
-     * @param {Socket} socket - The socket object of the user.
-     * @param {object} userCard - The card used for the attack.
-     */
-    #handleAttackCardRequest(socket, userCard) {
-        const battleSession = BattleSessionManager.findBattleSessionByPlayerId(socket.user._id);
-        if (!battleSession) {
-            console.error(`User ${socket.user._id} is not in a room`);
-            return;
-        }
-
-        const [attackerCard, attackedCard] = this.gameEngine.attackCard(battleSession, socket.user._id, userCard.cardId);
-        if (!attackedCard) {
-            console.error(`User ${socket.user._id} could not attack card ${userCard.cardId}`);
-            return;
-        }
-
-        this.actionEmitter.emitAttackActions(socket, battleSession, attackerCard, attackedCard);
-
-        if (!battleSession.isPvP) {
-            this.handleBotTurn(socket, battleSession);
-        }
-        this.#checkAndHandleGameOver(socket, battleSession);
-    }
-
-    /**
      * Handles a card draw request from a user.
      * @param {Socket} socket - The socket object of the user.
      * @param {string} playerId - The ID of the player drawing the card.
@@ -152,7 +117,7 @@ class SocketHandler {
         }
         console.log(`User ${playerId} is drawing a card in room ${battleSession.id}`);
 
-        const drawnCard = this.gameEngine.drawCard(battleSession, playerId);
+        const drawnCard = GameEngine.drawCard(battleSession, playerId);
         if (!drawnCard) {
             console.error(`User ${playerId} could not draw a card`);
             this.actionEmitter.emitNextTurnAction(battleSession);
@@ -162,34 +127,6 @@ class SocketHandler {
         this.actionEmitter.emitDrawAction(socket, battleSession, playerId, drawnCard);
 
         return drawnCard;
-    }
-
-    /**
-     * Handles a request to play a card to the field.
-     * @param {Socket} socket - The socket object of the user.
-     * @param {object} userCard - The card to be played.
-     */
-    #handlePlayCardToFieldRequest(socket, userCard) {
-        const battleSession = BattleSessionManager.findBattleSessionByPlayerId(socket.user._id);
-        if (!battleSession) {
-            console.error(`User ${socket.user._id} is not in a room`);
-            return;
-        }
-
-        const playedCard = this.gameEngine.playCardToField(battleSession, socket.user._id, userCard.cardId);
-        if (!playedCard) {
-            console.error(`User ${socket.user._id} could not play card ${userCard.cardId}`);
-            return;
-        }
-
-        this.actionEmitter.emitPlayAction(socket, battleSession, playedCard);
-
-        if (!battleSession.isPvP) {
-            this.handleBotTurn(socket, battleSession);
-            this.handleDrawCardRequest(socket, socket.user._id);
-        } else {
-            this.handleDrawCardRequest(socket, battleSession.getNextPlayerId(socket.user._id));
-        }
     }
 
     /**
@@ -338,6 +275,7 @@ class SocketHandler {
         this.handleDrawCardRequest(socket, battleSession.player2.id);
         const botActionArray = this.botHandler.handleBotTurn(battleSession);
         this.io.to(battleSession.id).emit("actions", botActionArray);
+        
     }
 
     /**
@@ -345,15 +283,18 @@ class SocketHandler {
      * @private
      * @param {Socket} socket - The socket object of the user.
      * @param {BattleSession} battleSession - The battle session object.
+     * @returns {boolean} - True if the game is over, false otherwise.
      */
-    #checkAndHandleGameOver(socket, battleSession) {
+    checkAndHandleGameOver(socket, battleSession) {
         if (battleSession.player1.isLost()) {
             this.#handleGameOver(battleSession.player2, battleSession);
+            return true;
         } else if (battleSession.player2.isLost()) {
             this.#handleGameOver(battleSession.player1, battleSession);
-        } else {
-            this.handleDrawCardRequest(socket, socket.user._id);
+            return true;
         }
+
+        return false;
     }
 }
 

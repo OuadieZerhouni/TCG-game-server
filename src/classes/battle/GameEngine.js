@@ -1,11 +1,9 @@
 const BattleSession = require('./BattleSession');
 
 class GameEngine {
-  constructor() {
-    this.battleSessions = BattleSession.sessionList;
-  }
 
-  attackCard(battleSession, playerId, cardId) {
+
+  static attackCard(battleSession, playerId, cardId) {
     const [attackerPlayer, attackedPlayer] = battleSession.player1.id === playerId
       ? [battleSession.player1, battleSession.player2]
       : [battleSession.player2, battleSession.player1];
@@ -20,7 +18,7 @@ class GameEngine {
     return [attackerCard, attackedCard];
   }
 
-  playCardToField(battleSession, playerId, cardId) {
+  static playCardToField(battleSession, playerId, cardId) {
     const player = battleSession.player1.id === playerId ? battleSession.player1 : battleSession.player2;
     const playedCard = player.playCardToField(cardId);
     if (playedCard) {
@@ -29,12 +27,12 @@ class GameEngine {
     return playedCard;
   }
 
-  drawCard(battleSession, playerId) {
+  static drawCard(battleSession, playerId) {
     const player = battleSession.player1.id === playerId ? battleSession.player1 : battleSession.player2;
     return player.drawCard();
   }
 
-  isBotTurn(battleSession) {
+  static isBotTurn(battleSession) {
     return !battleSession.isPvP && battleSession.currentTurnPlayerId === battleSession.player2.id;
   }
 }

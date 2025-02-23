@@ -1,16 +1,18 @@
 const ICommand = require('./ICommand');
 const BattleSessionManager = require('../BattleSessionManager');
+const SocketHandler = require('../../network/SocketHandler');
 
 class JoinBattleCommand extends ICommand {
-    constructor(
-        socketHandler,
-        socket,
-        battleSessionId
-    ) {
+    /**
+     * Creates an instance of JoinBattleCommand.
+     * @param {SocketHandler} socketHandler - The socket handler instance managing socket connections.
+     * @param {Object} payload - The payload object containing connection details.
+     */
+    constructor(socketHandler, payload) {
         super();
         this.socketHandler = socketHandler;
-        this.socket = socket;
-        this.battleSessionId = battleSessionId;
+        this.socket = payload.socket;
+        this.battleSessionId = payload.roomId;
     }
 
     execute() {
@@ -19,7 +21,8 @@ class JoinBattleCommand extends ICommand {
 
             const battleSession = BattleSessionManager.findBattleSessionById(this.battleSessionId);
             if (!battleSession) {
-                this.socketHandler.handleRoomNotFound(this.socket, this.battleSessionId);
+                this.socket.emit("roomNotFound", this.battleSessionId);
+                console.error(`BattleSession ${this.battleSessionId} not found for user ${this.socket.id}`);
                 return;
             }
 
@@ -30,6 +33,7 @@ class JoinBattleCommand extends ICommand {
             this.socketHandler.clearAutoSurrenderTimer(this.socket.user._id);
         } catch (err) {
             console.error(err);
+            this.socket.emit('commandFailed', { command: 'JoinBattle', error: err.message });
         }
     }
 }

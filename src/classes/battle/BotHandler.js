@@ -1,16 +1,19 @@
 const GameEngine = require('./GameEngine');
 
 class BotHandler {
-  constructor(io) {
+  /**
+   * @param {object} options
+   * @param {object} options.io - The socket.io instance.
+   */
+  constructor({ io }) {
     this.io = io;
-    this.gameEngine = new GameEngine();
   }
 
   handleBotTurn(battleSession) {
     const bot = battleSession.player2;
 
     if (bot.hand.length > 0) {
-      const playedCard = this.gameEngine.playCardToField(battleSession, bot.id, bot.hand[0].id);
+      const playedCard = GameEngine.playCardToField(battleSession, bot.id, bot.hand[0].id);
       if (playedCard) {
         return [{
           turn: battleSession.turn++,
@@ -20,7 +23,7 @@ class BotHandler {
         }];
       }
     } else if (bot.field.length > 0) {
-      const [attackerCard, attackedCard] = this.gameEngine.attackCard(battleSession, bot.id, bot.field[0].id);
+      const [attackerCard, attackedCard] = GameEngine.attackCard(battleSession, bot.id, bot.field[0].id);
       const result = [{
         turn: battleSession.turn++,
         actionType: "attackCard",
