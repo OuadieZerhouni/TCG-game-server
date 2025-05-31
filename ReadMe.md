@@ -144,6 +144,7 @@ The game uses a relational approach with the following key entities:
 **Ouadie ZERHOUNI**
 - Created: January 28, 2024
 - License: CC BY-NC-SA 4.0 (Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International)
+- See [LICENSE](LICENSE) file for full terms
 
 ## 🎮 Game Mechanics
 
