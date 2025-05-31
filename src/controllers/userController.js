@@ -15,8 +15,8 @@ class UserController {
   /**
    * Get a list of all users.
    *
-   * @param {express.Request} req - The request object.
-   * @param {express.Response} res - The response object.
+   * @param {Express.Request} req - The request object.
+   * @param {Express.Response} res - The response object.
    * @returns {Promise<void>}
    */
   static async getAllUsers(req, res) {
@@ -30,10 +30,101 @@ class UserController {
   }
 
   /**
+   * Login or register a user using Google Play Games ID.
+   *
+   * @param {Express.Request} req - The request object.
+   * @param {Express.Response} res - The response object.
+   * @returns {Promise<void>}
+   */
+  static async loginWithGooglePlay(req, res) {
+    try {
+      // Extract user info from the request body sent by the client
+      // This now expects the PlayGameUserInfo structure
+      const { userId, userName, userImageUrl } = req.body;
+      console.log('Received Google Play user data:', req.body);
+
+      if (!userId) {
+        // Renamed from googlePlayId to userId for clarity based on client data
+        return res.status(400).json({ message: 'Google Play User ID is required' });
+      }
+
+      // Find user by Google Play ID (which is the userId from the client)
+      let user = await UserService.findUserByGooglePlayId(userId);
+      let isNewAccount = false; // Flag to indicate if a new account was created
+
+      // If no user found, create a new one
+      if (!user) {
+        isNewAccount = true;
+        // Create a new user with Google Play ID
+        const newDeck = await DeckService.createDeck();
+        const userData = {
+          // Use userName from Play Games if available, otherwise generate a default
+          username: userName || `Player${Math.floor(Math.random() * 100000)}`,
+          // Email might not be provided by Play Games, handle accordingly
+          email: '', // Set to empty or handle as needed by your schema
+          googlePlayId: userId, // Store the Google Play User ID
+          // Add other default fields as before
+          rank: -1,
+          quote: '',
+          deck: newDeck._id,
+          diamondAmount: 100,
+          goldAmount: 10000,
+          equipments: [],
+          userCards: [],
+          // You might want to store the avatar URL if available
+          avatar: userImageUrl || '', // Store the image URL if provided
+        };
+
+        user = await UserService.createUser(userData);
+      }
+
+      // Generate token and return user data
+      const payload = {
+        user: {
+          _id: user._id,
+        },
+      };
+
+      // Prepare the user data to send back to the client
+      const responseUserData = {
+        _id: user._id, // Include user ID
+        username: user.username,
+        email: user.email,
+        level: user.level,
+        xp: user.xp,
+        friends: user.friends,
+        avatar: user.avatar,
+        googlePlayId: user.googlePlayId, // Ensure googlePlayId is included
+        // Include other relevant fields like gold, diamonds, etc.
+        goldAmount: user.goldAmount,
+        diamondAmount: user.diamondAmount,
+      };
+
+      jwt.sign(
+        payload,
+        process.env.JWT_SECRET,
+        { expiresIn: 360000 }, // Consider adjusting token expiration
+        (err, token) => {
+          if (err) throw err;
+          // Send back token, user data, and whether it's a new account
+          res.status(isNewAccount ? 201 : 200).json({
+            token,
+            user: responseUserData,
+            isNewAccount: isNewAccount // Inform client if account was just created
+          });
+        }
+      );
+    } catch (error) {
+      console.error('Google Play authentication error:', error);
+      res.status(500).send('Internal Server Error');
+    }
+  }
+  
+  /**
    * Login a user.
    * 
-   * @param {express.Request} req - The request object.
-   * @param {express.Response} res - The response object.
+   * @param {Express.Request} req - The request object.
+   * @param {Express.Response} res - The response object.
    * @returns {Promise<void>}
    */
 
@@ -83,8 +174,8 @@ class UserController {
   /**
    * Get the current user.
    *
-   * @param {express.Request} req - The request object.
-   * @param {express.Response} res - The response object.
+   * @param {Express.Request} req - The request object.
+   * @param {Express.Response} res - The response object.
    * @returns {Promise<void>}
    */
   static async getCurrentUser(req, res) {
@@ -101,8 +192,8 @@ class UserController {
   /**
    * Get a user by ID.
    *
-   * @param {express.Request} req - The request object.
-   * @param {express.Response} res - The response object.
+   * @param {Express.Request} req - The request object.
+   * @param {Express.Response} res - The response object.
    * @returns {Promise<void>}
    */
   static async getUserById(req, res) {

@@ -3,7 +3,7 @@
 
 /* Author: Ouadie ZERHOUNI
    Creation Date: 2024-01-28 01:21:48 */
-const CardModel = require("../models/Card");
+require("util");
 const User = require("../models/User"); // Adjust the path as needed
 const bcrypt = require("bcrypt");
 
@@ -28,6 +28,22 @@ class UserService {
     }
   }
 
+  
+/**
+ * Find a user by Google Play ID.
+ *
+ * @param {string} googlePlayId - The Google Play ID to search for.
+ * @returns {Promise<Object|null>} The found user or null.
+ */
+static async findUserByGooglePlayId(googlePlayId) {
+  try {
+    return await User.findOne({ googlePlayId });
+  } catch (error) {
+    console.error('Error finding user by Google Play ID:', error);
+    throw error;
+  }
+}
+
   /**
    * Create a new user.
    *
@@ -36,7 +52,7 @@ class UserService {
    */
   static async createUser(userData) {
     try {
-      userData.password = await UserService.hashPassword(userData.password);
+      if (userData.password) userData.password = await UserService.hashPassword(userData.password);
       const newUser = new User(userData);
       const createdUser = await newUser.save();
       return createdUser;

@@ -93,6 +93,32 @@ router.post('/check', UserController.checkUserExist);
  */
 router.post('/login', UserController.loginUser);
 
+/**
+ * @swagger
+ * /api/users/login/googleplay:
+ *   post:
+ *     summary: Login using Google Play Games ID
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               googlePlayId:
+ *                 type: string
+ *                 description: The Google Play Games user ID
+ *     responses:
+ *       200:
+ *         description: Successful login. Returns a token and user data.
+ *       404:
+ *         description: User not found. Account may need to be created or linked.
+ *       500:
+ *         description: Internal server error.
+ */
+router.post('/login/googlePlay', UserController.loginWithGooglePlay);
+
 router.use(checkJwt);
 
 /**

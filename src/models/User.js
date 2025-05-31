@@ -21,6 +21,7 @@ const userSchema = new mongoose.Schema({
   email: {
     type: String,
     required: false,
+    sparse: true, // This allows null values while maintaining uniqueness for non-null values
     unique: true,
   },
 
@@ -44,7 +45,7 @@ const userSchema = new mongoose.Schema({
    */
   password: {
     type: String,
-    required: true,
+    required: false, // Changed from true to false
   },
 
   /**
@@ -163,6 +164,32 @@ const userSchema = new mongoose.Schema({
       ref: 'UserCard',
     },
   ],
+
+  /**
+   * The Google Play ID associated with the user.
+   *
+   * @property {string} googlePlayId
+   */
+  googlePlayId: {
+    type: String,
+    sparse: true, // This allows null values while maintaining uniqueness for non-null values
+    unique: true,
+    index: true
+  },
+});
+
+// Add a pre-save hook to hash the password if it exists and is modified
+userSchema.pre('save', async function(next) {
+  // Only hash the password if it has been modified (or is new) and is not empty
+  if (!this.isModified('password') || !this.password) return next();
+
+  try {
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+    next();
+  } catch (error) {
+    next(error);
+  }
 });
 
 /**
@@ -176,6 +203,5 @@ User.prototype.comparePassword = async function (candidatePassword) {
   const isMatch = await bcrypt.compare(candidatePassword, this.password);
   return isMatch;
 }
-
 
 module.exports = User;
